@@ -45,6 +45,13 @@ on corrige les couleurs de la bandelette, puis on les compare à une table de r�
 - `requirements-deploy.txt` : les bibliothèques côté serveur (OpenCV « headless », sans fenêtre).
 - `tests/test_api.py` : 11 tests de l'API.
 
+## Livraison 3 : 10 paramètres, rapport, historique
+- `kromamed/config.py` décrit maintenant la bandelette **en millimètres** (4 pixels = 1 mm) : largeur, taille et écart
+  des plages. Changer de bandelette = changer ces chiffres, puis réimprimer la carte (`scripts/make_card.py`).
+- `api/report.py` fabrique le rapport PDF ; `api/exports.py` fabrique l'Excel. Les deux travaillent en mémoire.
+- L'historique est gardé dans le navigateur (`localStorage`) : le serveur ne conserve aucune donnée de santé.
+- Le minuteur est dans `web/index.html` (JavaScript) : il compte jusqu'à 2 min et sonne à 60 s et 120 s.
+
 ## Les scripts (`scripts/`)
 - `run.py` : analyse une photo, écrit `out/resultat.json` + images (carte redressée, carte corrigée, résultat annoté).
 - `benchmark.py` : 100 photos simulées → taux de bonnes lectures + cas qui doivent être refusés.
@@ -52,7 +59,7 @@ on corrige les couleurs de la bandelette, puis on les compare à une table de r�
 - `make_demo.py` : crée une photo de démonstration.
 
 ## Les tests (`tests/test_pipeline.py`)
-17 vérifications automatiques du moteur (+ 11 pour l'API) : repères trouvés, niveaux retrouvés sous différentes lumières, refus du flou,
+19 vérifications automatiques du moteur (+ 14 pour l'API) : repères trouvés, niveaux retrouvés sous différentes lumières, refus du flou,
 refus si un repère est caché, refus d'une ombre forte, refus d'une photo sans carte, couleurs inconnues
 déclarées « indéterminées », niveaux de la table assez distincts. `pytest -q` doit afficher `17 passed`.
 

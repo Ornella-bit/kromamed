@@ -11,6 +11,7 @@ import numpy as np
 
 from . import config as C
 from .color import hex_to_srgb, srgb_to_linear
+from .drawing import paint
 
 
 # ---------------------------------------------------------------- rendu --
@@ -39,8 +40,11 @@ def render_card(levels: dict[str, str] | None = None, with_strip: bool = True) -
         x, y, w, h = C.patch_rect(i)
         img[y:y + h, x:x + w] = rgb
 
+    _draw_texts(img)
+    x, y, w, h = C.STRIP_BODY
+    if not with_strip:                                   # carte à imprimer : contour de la fente
+        paint(img, lambda m: cv2.rectangle(m, (x - 2, y - 2), (x + w + 1, y + h + 1), 255, 1), (0.5, 0.5, 0.5))
     if with_strip:
-        x, y, w, h = C.STRIP_BODY
         img[y:y + h, x:x + w] = C.STRIP_BODY_COLOR
         levels = levels or {}
         for i, param in enumerate(C.PARAMS):
@@ -50,6 +54,26 @@ def render_card(levels: dict[str, str] | None = None, with_strip: bool = True) -
             px, py, pw, ph = C.pad_rect(i)
             img[py:py + ph, px:px + pw] = rgb_lin
     return img
+
+
+def _draw_texts(img: np.ndarray) -> None:
+    """Titre et noms des plages (ASCII : OpenCV ne dessine pas les accents)."""
+    ink = (0.08, 0.08, 0.08)
+    tx, ty, _, _ = C.TITLE_RECT
+    names = {"urobilinogene": "Urobilinogene", "proteines": "Proteines", "densite": "Densite",
+             "cetones": "Cetones", "ph": "pH"}
+
+    def draw(mask: np.ndarray) -> None:
+        cv2.putText(mask, "KROMA MED", (tx + 20, ty + 28), cv2.FONT_HERSHEY_SIMPLEX, 0.9, 255, 2, cv2.LINE_AA)
+        cv2.putText(mask, C.BRAND + " - pointe en haut", (tx + 20, ty + 52),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, 255, 1, cv2.LINE_AA)
+        for i, param in enumerate(C.PARAMS):
+            x, y, w, h = C.pad_rect(i)
+            label = f"{i + 1}. {names.get(param, param.capitalize())}"
+            cv2.putText(mask, label, (C.LABELS_RECT[0] + 6, y + h // 2 + 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.42, 255, 1, cv2.LINE_AA)
+
+    paint(img, draw, ink)
 
 
 def paper_mask() -> np.ndarray:
@@ -68,6 +92,8 @@ def paper_mask() -> np.ndarray:
         mask[y - pad:y + h + pad, x - pad:x + w + pad] = False
     x, y, w, h = C.STRIP_BODY
     mask[y - pad:y + h + pad, x - pad:x + w + pad] = False
+    for x, y, w, h in (C.TITLE_RECT, C.LABELS_RECT):
+        mask[y - pad:y + h + pad, x - pad:x + w + pad] = False
     return mask
 
 

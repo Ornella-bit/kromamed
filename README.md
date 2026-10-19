@@ -1,4 +1,4 @@
-# KromaMed — moteur de vision + API + démo web (Livraisons 1 et 2)
+# KromaMed — moteur de vision + API + démo web (Livraisons 1 à 3)
 
 Lecture colorimétrique de bandelettes urinaires à partir d'une simple photo de smartphone.
 Ce dépôt contient le **moteur de vision en Python/OpenCV** : il redresse la photo, corrige la lumière
@@ -32,10 +32,13 @@ python scripts/make_demo.py                         # crée une photo simulée d
 python scripts/run.py data/demo/photo_demo.png      # analyse -> out/resultat.json + images annotées
 python scripts/benchmark.py                         # 100 photos simulées + cas à refuser
 python scripts/make_card.py                         # carte d'étalonnage à imprimer (out/carte_etalonnage.png)
-pytest -q                                           # 28 tests automatiques (moteur + API)
+pytest -q                                           # 33 tests automatiques (moteur + API)
 ```
 Pour analyser **votre propre photo** : `python scripts/run.py chemin/vers/photo.jpg`
-(la photo doit montrer la carte imprimée avec ses 4 repères noirs et la bandelette posée dans son emplacement).
+(la photo doit montrer la carte imprimée avec ses 4 repères noirs et la bandelette posée dans sa fente).
+
+**Livraison 3 :** 10 paramètres (Multistix 10 SG), minuteur, rapport PDF, historique + export Excel.
+Avant d'imprimer la carte : `docs/MESURES_BANDELETTE.md`. Protocole et temps de lecture : `docs/PROTOCOLE.md`.
 
 ### Lancer la démo web en local (Livraison 2)
 ```bash
@@ -70,6 +73,8 @@ Ensuite, après chaque livraison : `git add . && git commit -m "message" && git 
 | `GET /` | page de démo |
 | `GET /api/scenarios`, `GET /api/demo/{id}` | photos simulées analysées (dont cas à refuser) |
 | `POST /api/analyze` | envoyer une photo (champ `file`) → résultat JSON + images annotées |
+| `POST /api/report` | rapport PDF (le navigateur renvoie le résultat ; rien n'est stocké) |
+| `POST /api/history/xlsx` | Excel de l'historique (colonnes de `base_donnees_tests.xlsx`) |
 | `GET /api/health` | vérification pour l'hébergeur |
 
 Les photos sont traitées en mémoire et jamais enregistrées.

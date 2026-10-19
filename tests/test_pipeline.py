@@ -51,11 +51,25 @@ def test_photo_sans_carte_est_refusee():
 
 
 def test_verdict_global():
-    normal = {p: C.REFERENCE_TABLE[p][0][0] for p in C.PARAMS}
-    normal["ph"] = "6,0"
+    normal = dict(C.NORMAL_DEFAULT)
     assert analyze(simulate_photo(normal, seed=2)).all_normal is True
     anormal = dict(normal, proteines="+++")
     assert analyze(simulate_photo(anormal, seed=2)).all_normal is False
+
+
+def test_dix_parametres_dans_l_ordre_de_la_notice():
+    assert len(C.PARAMS) == 10
+    assert C.PARAMS[0] == "leucocytes" and C.PARAMS[-1] == "glucose"
+    assert set(C.READ_TIME_S) == set(C.PARAMS) == set(C.REFERENCE_TABLE)
+
+
+def test_les_plages_ne_se_chevauchent_pas():
+    rects = [C.pad_rect(i) for i in range(len(C.PARAMS))]
+    for (x1, y1, w1, h1), (x2, y2, w2, h2) in zip(rects, rects[1:]):
+        assert y1 + h1 < y2
+    sx, sy, sw, sh = C.STRIP_BODY
+    for x, y, w, h in rects:
+        assert sx <= x and x + w <= sx + sw and sy <= y and y + h <= sy + sh
 
 
 def test_couleur_inconnue_est_indeterminee():

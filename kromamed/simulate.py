@@ -14,6 +14,7 @@ import numpy as np
 
 from . import config as C
 from .card import render_card
+from .drawing import paint
 from .color import linear_to_srgb
 
 
@@ -64,7 +65,8 @@ def simulate_photo(levels: dict[str, str] | None = None, seed: int = 0, *,
         pts = cv2.perspectiveTransform(
             np.float32([[[x * S, y * S], [(x + C.MARKER_SIZE) * S, (y + C.MARKER_SIZE) * S]]]), Hm)[0]
         p1, p2 = pts.astype(int)
-        cv2.rectangle(scene_img, tuple(p1 - 15), tuple(p2 + 15), (0.45, 0.3, 0.25), -1)
+        paint(scene_img, lambda m: cv2.rectangle(m, tuple(int(v) for v in p1 - 15), tuple(int(v) for v in p2 + 15), 255, -1),
+              (0.45, 0.3, 0.25))
 
     if blur_sigma > 0:
         scene_img = cv2.GaussianBlur(scene_img, (0, 0), blur_sigma)

@@ -111,7 +111,7 @@ def analyze(image: np.ndarray | str | Path, keep_debug: bool = False) -> Analysi
     # --- 3 + 4. Extraction et classification -----------------------------
     pads: list[PadResult] = []
     for i, param in enumerate(C.PARAMS):
-        rgb = calibration._patch_median(calibrated, C.pad_rect(i))
+        rgb = calibration._patch_median(calibrated, C.pad_rect(i), shrink=0.7)
         lab = linear_to_lab(rgb.reshape(1, 3)).reshape(3)
         pads.append(_INTERPRETER.classify(param, lab))
 

@@ -21,11 +21,16 @@ from pathlib import Path
 import cv2
 import numpy as np
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from pydantic import BaseModel, Field
+from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from kromamed import __version__, analyze
+from kromamed import config as C
+from .exports import build_history_xlsx
+from .report import build_report_pdf
 from kromamed.pipeline import AnalysisResult
 from kromamed.simulate import simulate_photo
 
@@ -45,8 +50,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET", "P
 
 
 # ------------------------------------------------------------ scénarios --
-_NORMAL = {"leucocytes": "négatif", "nitrites": "négatif", "ph": "6,0",
-           "proteines": "négatif", "glucose": "négatif", "cetones": "négatif", "sang": "négatif"}
+_NORMAL = C.NORMAL_DEFAULT
 
 SCENARIOS: dict[str, dict] = {
     "sain": dict(label="Résultat normal", levels=_NORMAL, kwargs={}),
@@ -56,6 +60,8 @@ SCENARIOS: dict[str, dict] = {
                       levels={**_NORMAL, "leucocytes": "++", "nitrites": "positif", "sang": "+"}, kwargs={}),
     "diabete": dict(label="Glycosurie et cétonurie",
                     levels={**_NORMAL, "glucose": "+++", "cetones": "+"}, kwargs={}),
+    "hepatique": dict(label="Bilirubine et urobilinogène élevés",
+                      levels={**_NORMAL, "bilirubine": "++", "urobilinogene": "++"}, kwargs={}),
     "lumiere_chaude": dict(label="Éclairage jaune et ombre (corrigé)",
                            levels={**_NORMAL, "proteines": "+"},
                            kwargs=dict(warm=0.45, shadow=0.12)),
@@ -65,8 +71,7 @@ SCENARIOS: dict[str, dict] = {
                          kwargs=dict(hide_marker=1)),
 }
 
-PARAM_LABELS = {"leucocytes": "Leucocytes", "nitrites": "Nitrites", "ph": "pH", "proteines": "Protéines",
-                "glucose": "Glucose", "cetones": "Cétones", "sang": "Sang"}
+PARAM_LABELS = C.LABELS_FR
 
 
 # ----------------------------------------------------------------- outils --
@@ -103,12 +108,14 @@ def _response(res: AnalysisResult, input_img: np.ndarray) -> dict:
     out["summary"] = _summary(res)
     for p in out["pads"]:
         p["label"] = PARAM_LABELS[p["param"]]
+        p["read_time_s"] = C.READ_TIME_S[p["param"]]
     images = {"input": _data_url(input_img)}
     for key in ("card_raw", "card_corrected", "card_result"):
         if key in res.debug:
             images[key] = _data_url(res.debug[key], max_width=600)
     out["images"] = images
     out["disclaimer"] = "Aide à la lecture, pas un diagnostic médical."
+    out["brand"] = C.BRAND
     return out
 
 
@@ -150,6 +157,35 @@ def analyze_upload(file: UploadFile = File(...)) -> dict:
         raise HTTPException(status_code=413, detail="Photo trop lourde (12 Mo maximum).")
     img = _decode(data)
     return _response(analyze(img, keep_debug=True), img)
+
+
+class ReportRequest(BaseModel):
+    patient_id: str = Field(default="", max_length=60)
+    date: str | None = Field(default=None, max_length=40)
+    result: dict
+
+
+class HistoryRequest(BaseModel):
+    rows: list[dict] = Field(max_length=2000)
+
+
+@app.post("/api/report")
+def report(req: ReportRequest) -> Response:
+    """PDF du rapport. Le résultat est renvoyé par le navigateur : rien n'est stocké côté serveur."""
+    r = req.result
+    if r.get("status") != "ok" or "pads" not in r or "quality" not in r:
+        raise HTTPException(status_code=422, detail="Aucun résultat valide à mettre en rapport.")
+    pdf = build_report_pdf(req.patient_id.strip(), req.date, r)
+    return Response(pdf, media_type="application/pdf",
+                    headers={"Content-Disposition": 'attachment; filename="rapport_kromamed.pdf"'})
+
+
+@app.post("/api/history/xlsx")
+def history_xlsx(req: HistoryRequest) -> Response:
+    """Excel de l'historique (colonnes de base_donnees_tests.xlsx). Historique gardé dans le navigateur."""
+    data = build_history_xlsx(req.rows)
+    return Response(data, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    headers={"Content-Disposition": 'attachment; filename="historique_kromamed.xlsx"'})
 
 
 # --------------------------------------------------------------- site web --
