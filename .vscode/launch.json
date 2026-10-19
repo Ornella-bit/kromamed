@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "KromaMed: analyser la photo de démo",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/run.py",
+      "args": ["data/demo/photo_demo.png", "--out", "out"],
+      "console": "integratedTerminal"
+    }
+  ]
+}
