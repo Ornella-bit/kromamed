@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KromaMed – lecteur de bandelettes urinaires</title>
+<meta name="theme-color" content="#0B1F3A">
+<link rel="icon" type="image/png" href="/static/02_icone_application.png">
+<style>
+  :root{
+    --navy:#0B1F3A; --teal:#0E6B6E; --green:#1E7F5C; --amber:#B7791F; --red:#B42318;
+    --bg:#F3F4F1; --card:#fff; --ink:#0B1F3A; --muted:#5B6B7F; --line:#E2E5E0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45}
+  header{background:var(--navy);color:#fff}
+  .wrap{max-width:980px;margin:0 auto;padding:0 18px}
+  .bar{display:flex;align-items:center;gap:12px;padding:14px 0}
+  .brand{font-weight:800;letter-spacing:.06em;font-size:20px}
+  .brand span{color:#5CC8C0}
+  .tag{margin-left:auto;font-size:12px;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:3px 10px;color:#cfe}
+  .hero{padding:6px 0 26px}
+  .hero h1{margin:0 0 6px;font-size:clamp(22px,4vw,32px)}
+  .hero p{margin:0;color:#c9d4e2;max-width:640px}
+  main{padding:22px 0 50px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .card h2{margin:0 0 4px;font-size:17px}
+  .card .sub{margin:0 0 12px;color:var(--muted);font-size:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  button,.btn{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 13px;border-radius:10px;transition:.15s}
+  button:hover,.btn:hover{border-color:var(--teal);color:var(--teal)}
+  .primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .primary:hover{background:#0b5a5c;color:#fff}
+  .bad{border-style:dashed}
+  input[type=file]{display:none}
+  .actions{display:flex;flex-wrap:wrap;gap:8px}
+  #result{margin-top:22px}
+  .banner{border-radius:14px;padding:16px 18px;color:#fff;margin-bottom:16px}
+  .banner h3{margin:0 0 4px;font-size:20px}
+  .banner ul{margin:6px 0 0;padding-left:18px}
+  .b-ok{background:var(--green)} .b-alert{background:var(--red)} .b-warn{background:var(--amber)} .b-rejected{background:#475467}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:13px}
+  .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:600}
+  .p-ok{background:#E3F3EC;color:var(--green)} .p-abn{background:#FBE4E1;color:var(--red)} .p-unk{background:#ECEEF1;color:#475467}
+  .meter{height:8px;background:#ECEEF1;border-radius:6px;position:relative;overflow:hidden;min-width:70px}
+  .meter i{display:block;height:100%;background:var(--teal)}
+  .q b{white-space:nowrap;text-align:right}
+  .q{display:grid;grid-template-columns:150px 1fr 56px;gap:10px;align-items:center;margin:7px 0;font-size:14px}
+  .q .meter{position:relative}
+  .q .thr{position:absolute;left:85%;top:-2px;bottom:-2px;width:2px;background:var(--navy)}
+  .q.fail .meter i{background:var(--red)}
+  .imgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:6px}
+  figure{margin:0} figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+  figcaption{font-size:13px;color:var(--muted);margin-top:4px}
+  details{margin-top:14px} summary{cursor:pointer;color:var(--muted);font-size:14px}
+  pre{background:#0B1F3A;color:#cfe;padding:12px;border-radius:10px;overflow:auto;font-size:12px}
+  .spin{display:none;align-items:center;gap:10px;margin-top:18px;color:var(--muted)}
+  .spin.on{display:flex}
+  .spin b{width:18px;height:18px;border:3px solid var(--line);border-top-color:var(--teal);border-radius:50%;animation:r .8s linear infinite}
+  @keyframes r{to{transform:rotate(360deg)}}
+  .note{font-size:13px;color:var(--muted);margin-top:22px;border-top:1px solid var(--line);padding-top:12px}
+  h4{margin:18px 0 6px;font-size:15px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="bar">
+      <svg width="30" height="30" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 C50 4 16 44 16 66 A34 34 0 0 0 84 66 C84 44 50 4 50 4 Z" fill="#fff"/><g transform="rotate(16 50 58)"><rect x="40" y="34" width="20" height="48" rx="6" fill="#0B1F3A"/><rect x="43.5" y="38.5" width="13" height="10" rx="3" fill="#0E6B6E"/><rect x="43.5" y="52.5" width="13" height="10" rx="3" fill="#1E7F5C"/><rect x="43.5" y="66.5" width="13" height="10" rx="3" fill="#2A9D8F"/></g></svg>
+      <div class="brand">KROMA <span>MED</span></div>
+      <div class="tag">Démo · Edge AI &amp; vision</div>
+    </div>
+    <div class="hero">
+      <h1>Un téléphone, une carte imprimée, une bandelette : 7 paramètres lus en quelques secondes.</h1>
+      <p>Le moteur corrige la lumière et les couleurs, puis refuse l'analyse quand la photo n'est pas fiable.</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <section class="card">
+      <h2>Essayer sans carte imprimée</h2>
+      <p class="sub">Photos simulées : lumière, ombres et perspective sont ajoutées artificiellement.</p>
+      <div class="chips" id="scenarios"><span class="sub">Chargement…</span></div>
+    </section>
+    <section class="card">
+      <h2>Analyser votre photo</h2>
+      <p class="sub">Photographiez la carte d'étalonnage avec la bandelette posée dans son emplacement (4 repères visibles).</p>
+      <div class="actions">
+        <label class="btn primary" for="cam">📷 Prendre une photo</label>
+        <label class="btn" for="pick">🖼️ Choisir un fichier</label>
+      </div>
+      <input id="cam" type="file" accept="image/*" capture="environment">
+      <input id="pick" type="file" accept="image/*">
+    </section>
+  </div>
+
+  <div class="spin" id="spin"><b></b><span>Analyse en cours…</span></div>
+  <div id="result" hidden></div>
+
+  <p class="note">KromaMed est une <b>aide à la lecture</b>, pas un diagnostic médical. Prototype de recherche : validé sur photos simulées, pas encore cliniquement.
+  Les photos sont analysées en mémoire et ne sont pas conservées.</p>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const CRITERIA = [
+  ["markers","Repères visibles"],["sharpness","Netteté"],["exposure","Exposition"],
+  ["illumination","Éclairage uniforme"],["calibration","Étalonnage des couleurs"]
+];
+
+function el(tag, attrs = {}, ...kids){
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)){
+    if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else e.setAttribute(k, v);
+  }
+  for (const kid of kids) if (kid) e.append(kid);
+  return e;
+}
+
+async function call(url, options){
+  $("#result").hidden = true; $("#spin").classList.add("on");
+  try{
+    const r = await fetch(url, options);
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || "Erreur serveur");
+    render(data);
+  }catch(err){
+    const box = $("#result"); box.replaceChildren(el("div",{class:"banner b-rejected"}, el("h3",{text:"Erreur"}), el("div",{text:String(err.message || err)})));
+    box.hidden = false;
+  }finally{ $("#spin").classList.remove("on"); }
+}
+
+function qualityBlock(q){
+  const box = el("div",{class:"card"}, el("h2",{text:`Qualité de la capture : ${Math.round(q.overall*100)} %`}),
+    el("p",{class:"sub",text:"Seuil de sécurité : 85 % (trait vertical). En dessous, aucune lecture n'est rendue."}));
+  for (const [key,label] of CRITERIA){
+    const v = q[key] ?? 0, fail = v < 0.85;
+    box.append(el("div",{class:"q"+(fail?" fail":"")}, el("span",{text:label}),
+      el("div",{class:"meter"}, el("i",{style:`width:${Math.round(v*100)}%`}), el("span",{class:"thr"})),
+      el("b",{text:Math.round(v*100)+" %"})));
+  }
+  return box;
+}
+
+function padsBlock(pads){
+  const tbl = el("table"), head = el("tr");
+  for (const h of ["Paramètre","Niveau","Statut","Confiance"]) head.append(el("th",{text:h}));
+  tbl.append(head);
+  for (const p of pads){
+    let cls = "p-unk", st = "Indéterminé";
+    if (p.status === "ok"){ cls = p.normal ? "p-ok" : "p-abn"; st = p.normal ? "Normal" : "Anormal"; }
+    tbl.append(el("tr",{}, el("td",{text:p.label}), el("td",{text:p.level ?? "—"}),
+      el("td",{}, el("span",{class:"pill "+cls,text:st})),
+      el("td",{}, el("div",{class:"meter"}, el("i",{style:`width:${Math.round(p.confidence*100)}%`})))));
+  }
+  return el("div",{class:"card"}, el("h2",{text:"Résultats par paramètre"}), tbl);
+}
+
+function figure(src, cap){ return el("figure",{}, el("img",{src, alt:cap}), el("figcaption",{text:cap})); }
+
+function render(d){
+  const box = $("#result"); box.replaceChildren();
+  const s = d.summary;
+  const ban = el("div",{class:"banner b-"+s.level}, el("h3",{text:s.headline}));
+  const ul = el("ul"); for (const t of s.details) ul.append(el("li",{text:t})); ban.append(ul);
+  box.append(ban);
+
+  const row = el("div",{class:"grid"});
+  row.append(qualityBlock(d.quality));
+  if (d.status === "ok") row.append(padsBlock(d.pads)); else row.style.gridTemplateColumns = "1fr";
+  box.append(row);
+
+  const im = d.images, imgs = el("div",{class:"imgs"});
+  if (im.input) imgs.append(figure(im.input,"Photo analysée"));
+  if (im.card_raw) imgs.append(figure(im.card_raw,"Carte redressée (avant correction)"));
+  if (im.card_result) imgs.append(figure(im.card_result,"Après correction + lecture"));
+  else if (im.card_corrected) imgs.append(figure(im.card_corrected,"Carte corrigée"));
+  box.append(el("div",{class:"card",style:"margin-top:16px"}, el("h2",{text:"Ce que voit le moteur"}), imgs));
+
+  const copy = {...d}; delete copy.images;
+  box.append(el("details",{}, el("summary",{text:`Détails techniques (JSON) · ${Math.round(d.duration_ms)} ms de calcul`}),
+    el("pre",{text:JSON.stringify(copy,null,2)})));
+  box.hidden = false; box.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+async function init(){
+  try{
+    const list = await (await fetch("/api/scenarios")).json();
+    const holder = $("#scenarios"); holder.replaceChildren();
+    for (const s of list){
+      const b = el("button",{class: s.label.includes("refusée") ? "bad" : "", text:s.label});
+      b.onclick = () => call("/api/demo/"+s.id);
+      holder.append(b);
+    }
+  }catch(e){ $("#scenarios").textContent = "Impossible de charger les démos."; }
+}
+
+for (const id of ["#cam","#pick"]){
+  $(id).addEventListener("change", (ev)=>{
+    const f = ev.target.files[0]; if (!f) return;
+    const fd = new FormData(); fd.append("file", f);
+    call("/api/analyze",{method:"POST", body:fd}); ev.target.value = "";
+  });
+}
+init();
+</script>
+</body>
+</html>

@@ -34,6 +34,17 @@ on corrige les couleurs de la bandelette, puis on les compare à une table de r�
   **ΔE** = cette distance. ΔE < 2 : presque indiscernable.
 - **KNN (plus proches voisins)** : on cherche, dans la table, la référence la plus proche de la couleur mesurée.
 
+## Livraison 2 : l'API et la page web
+- `api/main.py` : un serveur (FastAPI) qui enveloppe le moteur. Il reçoit une photo, appelle `analyze()`,
+  et renvoie le résultat en JSON avec les images annotées. Il ne contient AUCUN calcul de vision : tout
+  reste dans `kromamed/`. C'est ce qui permettra à une app mobile d'utiliser le même moteur.
+- `web/index.html` : la page de démo (HTML + JavaScript, sans framework). Elle appelle l'API avec `fetch`
+  et dessine le résultat. Boutons de démonstration = photos simulées par `kromamed/simulate.py`.
+- `Dockerfile` : la « recette » pour fabriquer une boîte qui contient le moteur et le serveur ; Render
+  la lit pour mettre le site en ligne. `render.yaml` : les réglages de cette mise en ligne.
+- `requirements-deploy.txt` : les bibliothèques côté serveur (OpenCV « headless », sans fenêtre).
+- `tests/test_api.py` : 11 tests de l'API.
+
 ## Les scripts (`scripts/`)
 - `run.py` : analyse une photo, écrit `out/resultat.json` + images (carte redressée, carte corrigée, résultat annoté).
 - `benchmark.py` : 100 photos simulées → taux de bonnes lectures + cas qui doivent être refusés.
@@ -41,7 +52,7 @@ on corrige les couleurs de la bandelette, puis on les compare à une table de r�
 - `make_demo.py` : crée une photo de démonstration.
 
 ## Les tests (`tests/test_pipeline.py`)
-17 vérifications automatiques : repères trouvés, niveaux retrouvés sous différentes lumières, refus du flou,
+17 vérifications automatiques du moteur (+ 11 pour l'API) : repères trouvés, niveaux retrouvés sous différentes lumières, refus du flou,
 refus si un repère est caché, refus d'une ombre forte, refus d'une photo sans carte, couleurs inconnues
 déclarées « indéterminées », niveaux de la table assez distincts. `pytest -q` doit afficher `17 passed`.
 

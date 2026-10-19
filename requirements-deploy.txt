@@ -1,0 +1,6 @@
+# Serveur (Docker / Render / Hugging Face) : OpenCV "headless" = sans interface graphique
+opencv-python-headless>=4.7
+numpy>=1.24
+fastapi>=0.110
+uvicorn[standard]>=0.27
+python-multipart>=0.0.9

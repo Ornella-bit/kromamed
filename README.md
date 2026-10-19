@@ -1,4 +1,4 @@
-# KromaMed — moteur de vision (Livraison 1 / Phase 1)
+# KromaMed — moteur de vision + API + démo web (Livraisons 1 et 2)
 
 Lecture colorimétrique de bandelettes urinaires à partir d'une simple photo de smartphone.
 Ce dépôt contient le **moteur de vision en Python/OpenCV** : il redresse la photo, corrige la lumière
@@ -32,10 +32,17 @@ python scripts/make_demo.py                         # crée une photo simulée d
 python scripts/run.py data/demo/photo_demo.png      # analyse -> out/resultat.json + images annotées
 python scripts/benchmark.py                         # 100 photos simulées + cas à refuser
 python scripts/make_card.py                         # carte d'étalonnage à imprimer (out/carte_etalonnage.png)
-pytest -q                                           # 17 tests automatiques
+pytest -q                                           # 28 tests automatiques (moteur + API)
 ```
 Pour analyser **votre propre photo** : `python scripts/run.py chemin/vers/photo.jpg`
 (la photo doit montrer la carte imprimée avec ses 4 repères noirs et la bandelette posée dans son emplacement).
+
+### Lancer la démo web en local (Livraison 2)
+```bash
+python -m uvicorn api.main:app --reload
+```
+Puis ouvrir **http://127.0.0.1:8000** (page de démo) et **http://127.0.0.1:8000/docs** (documentation de l'API).
+Arrêter le serveur : `Ctrl+C`. Mise en ligne : voir `docs/DEPLOIEMENT.md`.
 
 ## 3. Mettre sur GitHub
 1. Créer un compte sur github.com, puis **New repository** → nom `kromamed` → laisser vide (sans README) → Create.
@@ -57,6 +64,16 @@ Ensuite, après chaque livraison : `git add . && git commit -m "message" && git 
 - Les couleurs de la carte sont supposées parfaites ; une carte imprimée réelle doit être mesurée.
 - Le temps affiché est celui d'un PC en Python, pas d'un téléphone.
 
-## 5. Structure
+## 5. API
+| Route | Rôle |
+|---|---|
+| `GET /` | page de démo |
+| `GET /api/scenarios`, `GET /api/demo/{id}` | photos simulées analysées (dont cas à refuser) |
+| `POST /api/analyze` | envoyer une photo (champ `file`) → résultat JSON + images annotées |
+| `GET /api/health` | vérification pour l'hébergeur |
+
+Les photos sont traitées en mémoire et jamais enregistrées.
+
+## 6. Structure
 Voir `docs/EXPLICATIONS.md` (explication simple de chaque fichier) et `docs/Feuille_de_Route_Technique_KromaMed.pdf`.
 Identité visuelle retenue : `assets/brand/` (version « goutte »).
