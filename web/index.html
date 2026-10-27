@@ -24,20 +24,23 @@
       <div class="hello" id="hello" hidden></div>
       <h1>Lisez une bandelette en un scan.</h1>
       <svg class="art" viewBox="0 0 390 204" aria-hidden="true">
-        <!-- cadre de scan avec une bandelette à l'intérieur -->
+        <!-- 1. goutte + bandelette inclinée (à gauche) -->
+        <g transform="translate(-166 -6) scale(.93)"><path d="M275 14C275 14 205 96 205 148A70 70 0 0 0 345 148C345 96 275 14 275 14Z" fill="#FFD36B"/>
+        <g transform="rotate(14 270 140)"><rect x="252" y="66" width="36" height="142" rx="10" fill="#F7F6F1"/>
+        <rect x="258" y="80" width="24" height="18" rx="4" fill="#E6D77A"/><rect x="258" y="105" width="24" height="18" rx="4" fill="#C9A3BD"/>
+        <rect x="258" y="130" width="24" height="18" rx="4" fill="#9CBF9E"/><rect x="258" y="155" width="24" height="18" rx="4" fill="#DDA946"/>
+        <rect x="258" y="180" width="24" height="18" rx="4" fill="#7FA6C9"/></g></g>
+        <!-- flèche : de l'échantillon vers le scan -->
+        <path d="M176 104h34m-11-11l11 11-11 11" stroke="#1B2A1F" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- 2. cadre de scan avec une bandelette à l'intérieur (à droite) -->
+        <g transform="translate(200 0)">
         <rect x="28" y="8" width="124" height="190" rx="24" fill="#fff" fill-opacity=".42" stroke="#1B2A1F" stroke-width="4"/>
         <path d="M52 40v-12h12M116 28h12v12M52 166v12h12M116 178h12v-12" stroke="#1B2A1F" stroke-width="4" fill="none" stroke-linecap="round"/>
         <rect x="76" y="38" width="28" height="132" rx="9" fill="#F7F6F1" stroke="#1B2A1F" stroke-opacity=".3"/>
         <rect x="82" y="48" width="16" height="15" rx="4" fill="#E6D77A"/><rect x="82" y="69" width="16" height="15" rx="4" fill="#C9A3BD"/>
         <rect x="82" y="90" width="16" height="15" rx="4" fill="#9CBF9E"/><rect x="82" y="111" width="16" height="15" rx="4" fill="#DDA946"/>
         <rect x="82" y="132" width="16" height="15" rx="4" fill="#7FA6C9"/>
-        <path d="M42 106h96" stroke="#1E7F5C" stroke-width="2.5" stroke-dasharray="6 5"/>
-        <!-- goutte + bandelette inclinée -->
-        <g transform="translate(26 -6) scale(.93)"><path d="M275 14C275 14 205 96 205 148A70 70 0 0 0 345 148C345 96 275 14 275 14Z" fill="#FFD36B"/>
-        <g transform="rotate(14 270 140)"><rect x="252" y="66" width="36" height="142" rx="10" fill="#F7F6F1"/>
-        <rect x="258" y="80" width="24" height="18" rx="4" fill="#E6D77A"/><rect x="258" y="105" width="24" height="18" rx="4" fill="#C9A3BD"/>
-        <rect x="258" y="130" width="24" height="18" rx="4" fill="#9CBF9E"/><rect x="258" y="155" width="24" height="18" rx="4" fill="#DDA946"/>
-        <rect x="258" y="180" width="24" height="18" rx="4" fill="#7FA6C9"/></g></g>
+        <path d="M42 106h96" stroke="#1E7F5C" stroke-width="2.5" stroke-dasharray="6 5"/></g>
       </svg>
     </header>
     <div class="card lift">
