@@ -58,6 +58,7 @@ Arrêter le serveur : `Ctrl+C`. Mise en ligne : voir `docs/DEPLOIEMENT.md`.
 ## 3. Mettre sur GitHub
 1. Créer un compte sur github.com, puis **New repository** → nom `kromamed` → laisser vide (sans README) → Create.
 2. Dans le terminal VS Code, à la racine du projet :
+
 ```bash
 git init
 git add .
