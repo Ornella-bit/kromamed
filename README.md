@@ -5,8 +5,8 @@ Ce dépôt contient le **moteur de vision en Python/OpenCV** : il redresse la ph
 et les couleurs grâce à une carte d'étalonnage imprimée, lit chaque plage réactive et **refuse
 d'analyser** si la photo n'est pas assez fiable (seuil 85 %).
 
-## **Application de démonstration : https://kromamed.onrender.com**
-## **Video Youtube de la Démo : <https://youtube.com/shorts/907lXo1E15M>**
+>>**Application de démonstration : https://kromamed.onrender.com**
+>>**Video Youtube de la Démo : <https://youtube.com/shorts/907lXo1E15M>**
 
 > **État honnête du projet** : validé sur 100 photos **simulées** (700/700 plages correctes, cas
 > dégradés refusés). Pas encore validé sur de vraies photos ni cliniquement. Voir « Limites » plus bas.
