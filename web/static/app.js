@@ -96,9 +96,38 @@ const stripImages = (data) => { const c = { ...data }; delete c.images; return c
 const SCREENS = ["home", "test", "camera", "result", "history", "guide", "profile"];
 const ROUTES = { "/": "home", "/test": "test", "/camera": "camera", "/result": "result", "/history": "history", "/guide": "guide", "/profile": "profile" };
 let currentScreen = "home";
-function go(hash) { if (location.hash === hash || (hash === "#/" && !location.hash)) route(); else location.hash = hash; }
-function route() {
-  let name = ROUTES[location.hash.replace(/^#/, "") || "/"] || "home";
+const nameOf = (h) => ROUTES[(h || "").replace(/^#/, "") || "/"] || "home";
+const hashOf = (name) => "#" + Object.keys(ROUTES).find((k) => ROUTES[k] === name);
+
+/* Bouton RETOUR : sous-page -> onglet -> accueil -> sortie de l'application.
+   L'historique du navigateur ne contient jamais plus de 2 entrées : [accueil] et l'écran courant.
+   Ainsi « retour » revient toujours à l'accueil, sauf pour les sous-pages (voir parentOf). */
+function parentOf(name) {
+  if (name === "camera") return S.cameraFrom === "#/test" ? "test" : S.cameraFrom === "#/profile" ? "profile" : "home";
+  if (name === "result") return S.current && S.current.source === "history" ? "history" : S.testMode ? "profile" : "home";
+  return "home";
+}
+let leavingToHome = false;
+function go(hash) {
+  const name = nameOf(hash);
+  if (name === currentScreen) { showScreen(name); return; }
+  if (name === "home") { leavingToHome = true; history.back(); return; }          // on dépile jusqu'à l'accueil
+  if (currentScreen === "home") history.pushState({ n: name }, "", hashOf(name));   // accueil -> écran : on empile
+  else history.replaceState({ n: name }, "", hashOf(name));                          // écran -> écran : on remplace
+  showScreen(name);
+}
+window.addEventListener("popstate", () => {          // touche RETOUR du téléphone (ou bouton ← de l'application)
+  const name = nameOf(location.hash);
+  if (name === "home") {
+    if (leavingToHome) leavingToHome = false;
+    else if (currentScreen !== "home") {
+      const parent = parentOf(currentScreen);
+      if (parent !== "home") { history.pushState({ n: parent }, "", hashOf(parent)); showScreen(parent); return; }
+    }
+    showScreen("home");
+  } else showScreen(name);
+});
+function showScreen(name) {
   if (name === "result" && !S.current) name = "home";
   if (currentScreen === "camera" && name !== "camera") leaveCamera();
   currentScreen = name;
@@ -274,12 +303,12 @@ const entryOf = () => S.current.entry || { patient_id: S.pid, date: nowText() };
 const ACT = {
   start: () => startTest(true),
   notimer: () => startTest(false),
-  camback: () => go(S.cameraFrom),
+  camback: () => history.back(),
   shutter: shoot,
   gallery: () => $("#f-gallery").click(),
   native: () => $("#f-native").click(),
   reshoot() { S.armed = false; if (S.testMode) S.cameraFrom = "#/profile"; go("#/camera"); },
-  resback() { go(S.current.source === "history" ? "#/history" : "#/"); },
+  resback() { history.back(); },
   async demo(el) {
     setBusy(true, "Analyse de la démonstration…");
     try { S.testMode = false; S.pid = "DEMO"; S.pidKeep = false; S.current = { data: await api("/api/demo/" + el.dataset.id), source: "demo" }; go("#/result"); }
@@ -340,8 +369,14 @@ $("#f-restore").addEventListener("change", async (e) => {
 
 /* ---------- 9. Démarrage ---------- */
 $$("[data-i]").forEach((el) => (el.innerHTML = ic(el.dataset.i, +el.dataset.s || 24)));
-window.addEventListener("hashchange", route);
-route();
+// Au chargement : si on ouvre directement un écran (rechargement), on place l'accueil en dessous pour que RETOUR fonctionne.
+{
+  let first = nameOf(location.hash);
+  if (first === "result") first = "home";                 // pas de résultat après un rechargement
+  history.replaceState({ n: "home" }, "", "#/");
+  if (first !== "home") history.pushState({ n: first }, "", hashOf(first));
+  showScreen(first);
+}
 fetch("/api/scenarios").then((r) => r.json()).then((l) => { S.scenarios = l; if (currentScreen === "home") renderHome(); }).catch(() => {});
 fetch("/api/health").then((r) => r.json()).then((d) => { S.version = d.version; }).catch(() => {});
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
