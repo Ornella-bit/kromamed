@@ -123,9 +123,6 @@ function renderHome() {
   const name = getProfile().name.trim(), h = getHistory();
   $("#hello").hidden = !name; $("#hello").textContent = name ? `Bonjour, ${name}` : "";
   $("#home-count").textContent = `${h.length} test${h.length > 1 ? "s" : ""}`;
-  $("#home-recent").innerHTML = h.length
-    ? h.slice(-2).reverse().map(entryRow).join("")
-    : `<div class="empty">Aucun test enregistré.<br>Faites un test ou essayez une démo ci-dessous.</div>`;
   $("#demo-chips").innerHTML = S.scenarios.length
     ? S.scenarios.map((s) => `<button class="chip${s.label.includes("refusée") ? " bad" : ""}" data-act="demo" data-id="${esc(s.id)}">${esc(s.label)}</button>`).join("")
     : `<span class="note">Démos indisponibles hors connexion.</span>`;

@@ -36,7 +36,10 @@ body.nonav #tabs{display:none}
 .brand{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.06em}
 .hero h1{margin:14px 0 0;font-size:27px;line-height:1.18;max-width:300px}
 .hello{font-size:13px;font-weight:700;margin-top:8px;color:#4B3B10}
-.hero svg.art{display:block;width:100%;height:auto;margin-top:2px}
+.hero svg.art{display:block;width:100%;height:clamp(120px,24dvh,204px);margin-top:2px}
+/* petits écrans : l'accueil doit tenir sans défiler */
+@media(max-height:780px){.hero svg.art{height:clamp(90px,17dvh,150px)}.hero{padding-bottom:30px}.hero h1{font-size:24px;margin-top:10px}.hello{margin-top:4px}.tile{padding:10px 14px}h2.sec{margin-top:12px}}
+@media(max-height:690px){.home-note{display:none}.lift{padding:10px 14px}.btn.big{min-height:52px}}
 
 /* ---------- composants ---------- */
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;margin:0 16px 12px;padding:14px}
