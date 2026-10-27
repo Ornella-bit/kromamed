@@ -22,5 +22,5 @@ Ensuite : ouvrez `kromamed/config.py`, section « Bandelette Multistix 10 SG »,
 
 ```
 python scripts/make_card.py     # nouvelle carte à imprimer
-pytest -q                       # doit afficher 33 passed
+pytest -q                       # doit afficher 35 passed
 ```

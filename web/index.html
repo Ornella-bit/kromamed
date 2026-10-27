@@ -2,324 +2,145 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>KromaMed – lecteur de bandelettes urinaires</title>
-<meta name="theme-color" content="#0B1F3A">
-<meta name="description" content="KromaMed : lecture colorimétrique de bandelettes urinaires Multistix 10 SG par smartphone. Aide à la lecture, pas un diagnostic.">
-<link rel="icon" type="image/png" href="/static/02_icone_application.png">
-<style>
-  :root{--navy:#0B1F3A;--teal:#0E6B6E;--green:#1E7F5C;--amber:#B7791F;--red:#B42318;--bg:#F3F4F1;--card:#fff;--ink:#0B1F3A;--muted:#5B6B7F;--line:#E2E5E0}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45}
-  header{background:linear-gradient(rgba(11,31,58,.82),rgba(11,31,58,.92)),url(/static/bg_tech.jpg) center/cover;color:#fff}
-  .wrap{max-width:1000px;margin:0 auto;padding:0 18px}
-  .bar{display:flex;align-items:center;gap:12px;padding:14px 0}
-  .brand{font-weight:800;letter-spacing:.06em;font-size:20px}.brand span{color:#5CC8C0}
-  .tag{margin-left:auto;font-size:12px;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:3px 10px;color:#cfe}
-  .hero{padding:6px 0 28px}
-  .hero h1{margin:0 0 6px;font-size:clamp(22px,4vw,32px)}
-  .hero p{margin:0;color:#c9d4e2;max-width:660px}
-  main{padding:22px 0 50px}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:720px){.grid{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-  .card h2{margin:0 0 4px;font-size:17px}
-  .sub{margin:0 0 12px;color:var(--muted);font-size:14px}
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  button,.btn{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 13px;border-radius:10px;transition:.15s;display:inline-block}
-  button:hover,.btn:hover{border-color:var(--teal);color:var(--teal)}
-  button:disabled{opacity:.45;cursor:not-allowed}
-  .primary{background:var(--teal);color:#fff;border-color:var(--teal)}
-  .primary:hover{background:#0b5a5c;color:#fff}
-  .bad{border-style:dashed}
-  input[type=file]{display:none}
-  input[type=text]{font:inherit;width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
-  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-  #result{margin-top:22px}
-  .banner{border-radius:14px;padding:16px 18px;color:#fff;margin-bottom:16px}
-  .banner h3{margin:0 0 4px;font-size:20px}.banner ul{margin:6px 0 0;padding-left:18px}
-  .b-ok{background:var(--green)}.b-alert{background:var(--red)}.b-warn{background:var(--amber)}.b-rejected{background:#475467}
-  table{width:100%;border-collapse:collapse;font-size:14.5px}
-  th,td{text-align:left;padding:7px 5px;border-bottom:1px solid var(--line)}
-  th{color:var(--muted);font-weight:600;font-size:13px}
-  .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:600}
-  .p-ok{background:#E3F3EC;color:var(--green)}.p-abn{background:#FBE4E1;color:var(--red)}.p-unk{background:#ECEEF1;color:#475467}
-  .meter{height:8px;background:#ECEEF1;border-radius:6px;position:relative;overflow:hidden;min-width:60px}
-  .meter i{display:block;height:100%;background:var(--teal)}
-  .q{display:grid;grid-template-columns:150px 1fr 56px;gap:10px;align-items:center;margin:7px 0;font-size:14px}
-  .q b{white-space:nowrap;text-align:right}
-  .q .thr{position:absolute;left:85%;top:-2px;bottom:-2px;width:2px;background:var(--navy)}
-  .q.fail .meter i{background:var(--red)}
-  .imgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:6px}
-  figure{margin:0}figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
-  figcaption{font-size:13px;color:var(--muted);margin-top:4px}
-  details{margin-top:14px}summary{cursor:pointer;color:var(--muted);font-size:14px}
-  pre{background:#0B1F3A;color:#cfe;padding:12px;border-radius:10px;overflow:auto;font-size:12px}
-  .spin{display:none;align-items:center;gap:10px;margin-top:18px;color:var(--muted)}
-  .spin.on{display:flex}
-  .spin b{width:18px;height:18px;border:3px solid var(--line);border-top-color:var(--teal);border-radius:50%;animation:r .8s linear infinite}
-  @keyframes r{to{transform:rotate(360deg)}}
-  .note{font-size:13px;color:var(--muted);margin-top:22px;border-top:1px solid var(--line);padding-top:12px}
-  .section{margin-top:16px}
-  /* minuteur */
-  .timer{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
-  @media(max-width:600px){.timer{grid-template-columns:1fr}}
-  .clock{font-size:46px;font-weight:800;font-variant-numeric:tabular-nums;min-width:130px;text-align:center;border-radius:14px;padding:8px 14px;background:#ECEEF1;color:var(--navy)}
-  .clock.wait{background:#FDEBD0;color:#9A5B05}.clock.go{background:#DDF3E8;color:var(--green)}.clock.late{background:#E3EEF9;color:#1F5C99}
-  .track{position:relative;height:12px;background:#ECEEF1;border-radius:8px;margin:8px 0 22px}
-  .track i{display:block;height:100%;background:var(--teal);border-radius:8px;width:0}
-  .mark{position:absolute;top:16px;font-size:11px;color:var(--muted);transform:translateX(-50%);white-space:nowrap}
-  .mark::before{content:"";position:absolute;left:50%;top:-14px;width:1px;height:12px;background:var(--muted)}
-  #tmsg{font-size:15px;margin:0 0 4px;font-weight:600}
-  ol.steps{margin:6px 0 0;padding-left:20px}ol.steps li{margin:5px 0}
-  .mock{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:center}
-  @media(max-width:720px){.mock{grid-template-columns:1fr}}
-  .mock img{width:100%;border-radius:12px;border:1px solid var(--line)}
-  .row-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
-</style>
+<meta name="description" content="KromaMed : lecture de bandelettes urinaires Multistix 10 SG avec un smartphone. Aide à la lecture, pas un diagnostic.">
+<meta name="theme-color" content="#F2B134">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" href="/static/icons/favicon.png">
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="KromaMed">
+<link rel="preload" href="/static/fonts/plus-jakarta-sans-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <div class="bar">
-      <svg width="30" height="30" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 C50 4 16 44 16 66 A34 34 0 0 0 84 66 C84 44 50 4 50 4 Z" fill="#fff"/><g transform="rotate(16 50 58)"><rect x="40" y="34" width="20" height="48" rx="6" fill="#0B1F3A"/><rect x="43.5" y="38.5" width="13" height="10" rx="3" fill="#0E6B6E"/><rect x="43.5" y="52.5" width="13" height="10" rx="3" fill="#1E7F5C"/><rect x="43.5" y="66.5" width="13" height="10" rx="3" fill="#2A9D8F"/></g></svg>
-      <div class="brand">KROMA <span>MED</span></div>
-      <div class="tag">Démo · Edge AI &amp; vision</div>
-    </div>
-    <div class="hero">
-      <h1>Un téléphone, une carte imprimée, une bandelette : 10 paramètres lus en quelques secondes.</h1>
-      <p>Bandelettes Multistix 10 SG. Le moteur corrige la lumière et les couleurs, puis refuse l'analyse quand la photo n'est pas fiable.</p>
-    </div>
-  </div>
-</header>
+<div id="app">
 
-<main class="wrap">
-  <div class="grid">
-    <section class="card">
-      <h2>Essayer sans carte imprimée</h2>
-      <p class="sub">Photos simulées : lumière, ombres et perspective sont ajoutées artificiellement.</p>
-      <div class="chips" id="scenarios"><span class="sub">Chargement…</span></div>
-    </section>
-    <section class="card">
-      <h2>Analyser votre photo</h2>
-      <p class="sub">Photographiez la carte d'étalonnage avec la bandelette posée dans sa fente (4 repères visibles).</p>
-      <input type="text" id="pid" maxlength="60" placeholder="Identifiant du test (facultatif, ex. TEST_001)" autocomplete="off">
-      <div class="actions">
-        <label class="btn primary" for="cam">📷 Prendre une photo</label>
-        <label class="btn" for="pick">🖼️ Choisir un fichier</label>
-      </div>
-      <input id="cam" type="file" accept="image/*" capture="environment">
-      <input id="pick" type="file" accept="image/*">
-    </section>
-  </div>
-
-  <section class="card section" id="timerCard">
-    <h2>Minuteur de lecture</h2>
-    <p class="sub">Démarrez au moment où vous retirez la bandelette de l'urine. Chaque plage a son temps de lecture (notice Multistix 10 SG).</p>
-    <div class="timer">
-      <div class="clock" id="clock">0:00</div>
-      <div>
-        <p id="tmsg">Prêt.</p>
-        <div class="track" id="track"><i id="tbar"></i>
-          <span class="mark" style="left:25%">30 s</span><span class="mark" style="left:33.3%;top:30px">40</span><span class="mark" style="left:50%">1 min</span><span class="mark" style="left:100%">2 min</span>
-        </div>
-        <div class="actions"><button class="primary" id="tstart">▶ Démarrer le minuteur</button><button id="treset" disabled>↺ Réinitialiser</button></div>
-      </div>
+  <!-- ===== Accueil ===== -->
+  <section class="screen on" id="s-home">
+    <header class="hd hero">
+      <div class="brand"><span data-i="drop"></span>KROMA MED</div>
+      <div class="hello" id="hello" hidden></div>
+      <h1>Lisez une bandelette en un scan.</h1>
+      <svg class="art" viewBox="0 0 390 204" aria-hidden="true">
+        <!-- cadre de scan avec une bandelette à l'intérieur -->
+        <rect x="28" y="8" width="124" height="190" rx="24" fill="#fff" fill-opacity=".42" stroke="#1B2A1F" stroke-width="4"/>
+        <path d="M52 40v-12h12M116 28h12v12M52 166v12h12M116 178h12v-12" stroke="#1B2A1F" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <rect x="76" y="38" width="28" height="132" rx="9" fill="#F7F6F1" stroke="#1B2A1F" stroke-opacity=".3"/>
+        <rect x="82" y="48" width="16" height="15" rx="4" fill="#E6D77A"/><rect x="82" y="69" width="16" height="15" rx="4" fill="#C9A3BD"/>
+        <rect x="82" y="90" width="16" height="15" rx="4" fill="#9CBF9E"/><rect x="82" y="111" width="16" height="15" rx="4" fill="#DDA946"/>
+        <rect x="82" y="132" width="16" height="15" rx="4" fill="#7FA6C9"/>
+        <path d="M42 106h96" stroke="#1E7F5C" stroke-width="2.5" stroke-dasharray="6 5"/>
+        <!-- goutte + bandelette inclinée -->
+        <g transform="translate(26 -6) scale(.93)"><path d="M275 14C275 14 205 96 205 148A70 70 0 0 0 345 148C345 96 275 14 275 14Z" fill="#FFD36B"/>
+        <g transform="rotate(14 270 140)"><rect x="252" y="66" width="36" height="142" rx="10" fill="#F7F6F1"/>
+        <rect x="258" y="80" width="24" height="18" rx="4" fill="#E6D77A"/><rect x="258" y="105" width="24" height="18" rx="4" fill="#C9A3BD"/>
+        <rect x="258" y="130" width="24" height="18" rx="4" fill="#9CBF9E"/><rect x="258" y="155" width="24" height="18" rx="4" fill="#DDA946"/>
+        <rect x="258" y="180" width="24" height="18" rx="4" fill="#7FA6C9"/></g></g>
+      </svg>
+    </header>
+    <div class="card lift">
+      <button class="btn primary big" data-go="#/test"><span data-i="cam" data-s="26"></span>Nouveau test</button>
+      <p class="note" style="text-align:center">Prévoyez la carte imprimée et 60 s d'attente.</p>
     </div>
-    <p class="sub" style="margin:12px 0 0"><b>30 s</b> glucose, bilirubine · <b>40 s</b> cétones · <b>45 s</b> densité · <b>60 s</b> sang, pH, protéines, urobilinogène, nitrites · <b>2 min</b> leucocytes.
-    Une photo unique à 60 s est un compromis ; pour les leucocytes, reprenez une photo à 2 min.</p>
+    <div class="duo">
+      <button class="tile" data-go="#/guide"><i data-i="guide" data-s="26"></i><b>Guide</b><span>5 étapes + minuteur</span></button>
+      <button class="tile" data-go="#/history"><i data-i="hist" data-s="26"></i><b>Historique</b><span id="home-count">0 test</span></button>
+    </div>
+    <h2 class="sec">Derniers résultats</h2>
+    <div class="card flush" id="home-recent"></div>
+    <h2 class="sec">Essayer sans carte imprimée</h2>
+    <div class="chips" id="demo-chips"></div>
+    <p class="note" style="margin:8px 16px 24px">Photos simulées pour la démonstration. KromaMed est une aide à la lecture, pas un diagnostic.</p>
   </section>
 
-  <div class="spin" id="spin"><b></b><span>Analyse en cours…</span></div>
-  <div id="result" hidden></div>
-
-  <section class="card section" id="histCard" hidden>
-    <h2>Historique (sur cet appareil)</h2>
-    <p class="sub">Enregistré dans votre navigateur uniquement. Rien n'est envoyé ni conservé sur le serveur.</p>
-    <div style="overflow-x:auto"><table id="histTable"></table></div>
-    <div class="row-actions"><button id="histXlsx">📊 Télécharger l'historique (Excel)</button><button id="histClear">🗑️ Effacer</button></div>
-  </section>
-
-  <section class="card section">
-    <h2>Guide d'utilisation en 5 étapes</h2>
-    <ol class="steps">
-      <li><b>Préparation :</b> urine fraîche dans un récipient propre et sec ; carte d'étalonnage imprimée à plat sur une table.</li>
-      <li><b>Immersion :</b> tremper brièvement (1 seconde maximum) toutes les plages de la bandelette, puis démarrer le minuteur.</li>
-      <li><b>Séchage :</b> effleurer le bord de la bandelette sur un papier absorbant pour éviter que les réactifs ne bavent d'une plage à l'autre.</li>
-      <li><b>Mise en place :</b> poser la bandelette dans la fente de la carte, pointe en haut (la plage « 1. Leucocytes » en haut).</li>
-      <li><b>Photo :</b> à 60 s, téléphone à plat au-dessus de la carte, lumière naturelle homogène, sans flash, les 4 repères noirs visibles.</li>
-    </ol>
-  </section>
-
-  <section class="card section">
-    <div class="mock">
-      <div><h2>Vers l'application mobile</h2>
-        <p class="sub">Le même moteur alimentera une application Android : écran d'accueil, scan guidé avec le minuteur, résultat détaillé et rapport PDF à partager.</p></div>
-      <img src="/static/maquette_mobile.png" alt="Maquette de l'application mobile KromaMed : accueil, scan, résultat" loading="lazy">
+  <!-- ===== Nouveau test : préparation ===== -->
+  <section class="screen" id="s-test">
+    <header class="hd bar"><button class="back" data-go="#/" aria-label="Retour"><span data-i="back"></span></button>
+      <div><h1>Nouveau test</h1><small>Préparation</small></div></header>
+    <div class="card" style="margin-top:14px">
+      <label class="f" for="pid">Identifiant du test (facultatif)</label>
+      <input type="text" id="pid" maxlength="60" autocomplete="off" placeholder="ex. TEST_001">
+    </div>
+    <div class="card">
+      <b>Avant de commencer</b>
+      <div class="check"><i>✓</i><span>La carte d'étalonnage est imprimée et posée <b>à plat</b>.</span></div>
+      <div class="check"><i>✓</i><span>Lumière naturelle, <b>sans flash</b>, sans ombre sur la carte.</span></div>
+      <div class="check"><i>✓</i><span>Vous êtes prêt(e) à tremper la bandelette <b>1 seconde</b>.</span></div>
+    </div>
+    <div class="card">
+      <button class="btn primary big" data-act="start"><span data-i="clock" data-s="24"></span>Bandelette trempée : démarrer</button>
+      <p class="note">Le minuteur de 60 s démarre et la caméra s'ouvre. La photo se prend à 60 s.</p>
+      <button class="btn out sm" style="margin-top:12px" data-act="notimer">Prendre la photo sans minuteur</button>
     </div>
   </section>
 
-  <p class="note">KromaMed est une <b>aide à la lecture</b>, pas un diagnostic médical. Prototype de recherche : validé sur photos simulées, pas encore cliniquement. Les couleurs de référence sont des valeurs de démonstration.
-  Les photos sont analysées en mémoire et ne sont pas conservées.</p>
-</main>
+  <!-- ===== Caméra ===== -->
+  <section class="screen" id="s-camera">
+    <video id="video" autoplay playsinline muted></video>
+    <div class="cam-top"><button class="back" data-act="camback" aria-label="Retour"><span data-i="back"></span></button>
+      <div><b id="cam-title">Photo</b><small id="cam-sub">Alignez la carte dans le cadre</small></div></div>
+    <div class="tchip" id="tchip" hidden></div>
+    <div class="guide" id="guide"><b></b><b></b><b></b><b></b></div>
+    <div class="hint" id="hint">Toute la carte dans le cadre · 4 carrés noirs visibles</div>
+    <div id="cam-error" hidden></div>
+    <div class="cam-bottom">
+      <button class="side" data-act="gallery" aria-label="Choisir une photo"><span data-i="img" data-s="26"></span></button>
+      <button class="shutter" id="shutter" data-act="shutter" aria-label="Prendre la photo">
+        <svg viewBox="0 0 104 104" aria-hidden="true"><circle cx="52" cy="52" r="46" fill="rgba(15,27,36,.55)" stroke="rgba(255,255,255,.2)" stroke-width="6"/>
+          <circle id="ring" cx="52" cy="52" r="46" fill="none" stroke="#F2B134" stroke-width="6" stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289" transform="rotate(-90 52 52)"/></svg>
+        <div class="in"><b id="clock">Photo</b><span id="clock-sub"></span></div></button>
+      <button class="side" data-act="native" aria-label="Appareil photo du téléphone"><span data-i="cam" data-s="26"></span></button>
+    </div>
+  </section>
 
-<script>
-const $ = (s) => document.querySelector(s);
-const CRITERIA = [["markers","Repères visibles"],["sharpness","Netteté"],["exposure","Exposition"],["illumination","Éclairage uniforme"],["calibration","Étalonnage des couleurs"]];
-let LAST = null;                       // dernier résultat analysé (sans images)
-const HKEY = "kromamed_history_v1";
+  <!-- ===== Résultat ===== -->
+  <section class="screen" id="s-result"><div id="result-body"></div></section>
 
-function el(tag, attrs = {}, ...kids){
-  const e = document.createElement(tag);
-  for (const [k,v] of Object.entries(attrs)){ if (k==="class") e.className=v; else if (k==="text") e.textContent=v; else e.setAttribute(k,v); }
-  for (const kid of kids) if (kid) e.append(kid);
-  return e;
-}
-const fmtTime = (s) => s < 60 ? s+" s" : (s%60===0 ? (s/60)+" min" : s+" s");
+  <!-- ===== Historique ===== -->
+  <section class="screen" id="s-history">
+    <header class="hd bar"><div><h1>Historique</h1><small id="hist-sub">Sur cet appareil</small></div></header>
+    <div id="history-body" style="padding-top:14px"></div>
+  </section>
 
-/* ---------- appels API ---------- */
-async function call(url, options){
-  $("#result").hidden = true; $("#spin").classList.add("on");
-  try{
-    const r = await fetch(url, options);
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.detail || "Erreur serveur");
-    render(data);
-  }catch(err){
-    const box = $("#result"); box.replaceChildren(el("div",{class:"banner b-rejected"}, el("h3",{text:"Erreur"}), el("div",{text:String(err.message||err)})));
-    box.hidden = false;
-  }finally{ $("#spin").classList.remove("on"); }
-}
+  <!-- ===== Guide ===== -->
+  <section class="screen" id="s-guide">
+    <header class="hd bar"><div><h1>Guide en 5 étapes</h1><small>Pour un résultat fiable</small></div></header>
+    <div style="height:14px"></div>
+    <div class="card step"><div class="num">1</div><div><b>Préparer</b><span>Urine fraîche dans un récipient propre et sec. Carte imprimée posée à plat.</span></div></div>
+    <div class="card step"><div class="num">2</div><div><b>Tremper</b><span>1 seconde maximum, toutes les plages dans l'urine. Le minuteur démarre.</span></div></div>
+    <div class="card step"><div class="num">3</div><div><b>Sécher</b><span>Effleurer le bord de la bandelette sur un papier absorbant (pour que les réactifs ne bavent pas).</span></div></div>
+    <div class="card step"><div class="num">4</div><div><b>Placer</b><span>Bandelette dans la fente de la carte, pointe en haut (« 1. Leucocytes » en haut).</span></div></div>
+    <div class="card step"><div class="num">5</div><div><b>Photographier</b><span>À 60 s, sans flash, les 4 carrés noirs visibles, téléphone à plat au-dessus de la carte.</span></div></div>
+    <div class="card"><b>Temps de lecture (Multistix 10 SG)</b>
+      <p class="note"><b>30 s</b> glucose, bilirubine · <b>40 s</b> cétones · <b>45 s</b> densité · <b>60 s</b> sang, pH, protéines, urobilinogène, nitrites · <b>2 min</b> leucocytes.</p>
+      <p class="note">Une photo unique à 60 s est un compromis : pour les leucocytes, reprenez une photo à 2 min.</p></div>
+    <div class="card" style="background:none;border:0;padding:0 0 20px"><button class="btn primary" data-go="#/test">Démarrer un test</button></div>
+  </section>
 
-async function download(url, body, filename){
-  const r = await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-  if (!r.ok){ let d={}; try{d=await r.json();}catch(e){} alert(d.detail || "Téléchargement impossible."); return; }
-  const blob = await r.blob(), a = document.createElement("a");
-  a.href = URL.createObjectURL(blob); a.download = filename; document.body.append(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
-}
+  <!-- ===== Profil ===== -->
+  <section class="screen" id="s-profile">
+    <header class="hd bar"><div><h1>Profil</h1><small>Vos informations restent sur cet appareil</small></div></header>
+    <div id="profile-body" style="padding-top:14px"></div>
+  </section>
 
-const nowText = () => { const d=new Date(), p=(n)=>String(n).padStart(2,"0");
-  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+  <!-- ===== Barre du bas ===== -->
+  <nav id="tabs" aria-label="Navigation">
+    <button class="tab" data-tab="home" data-go="#/"><span data-i="home"></span>Accueil</button>
+    <button class="tab" data-tab="history" data-go="#/history"><span data-i="hist"></span>Historique</button>
+    <button class="fab" data-go="#/test" aria-label="Nouveau test"><span data-i="cam" data-s="28"></span></button>
+    <button class="tab" data-tab="guide" data-go="#/guide"><span data-i="guide"></span>Guide</button>
+    <button class="tab" data-tab="profile" data-go="#/profile"><span data-i="user"></span>Profil</button>
+  </nav>
 
-/* ---------- affichage du résultat ---------- */
-function qualityBlock(q){
-  const box = el("div",{class:"card"}, el("h2",{text:`Qualité de la capture : ${Math.round(q.overall*100)} %`}),
-    el("p",{class:"sub",text:"Seuil de sécurité : 85 % (trait vertical). En dessous, aucune lecture n'est rendue."}));
-  for (const [key,label] of CRITERIA){
-    const v = q[key] ?? 0, fail = v < 0.85;
-    box.append(el("div",{class:"q"+(fail?" fail":"")}, el("span",{text:label}),
-      el("div",{class:"meter"}, el("i",{style:`width:${Math.round(v*100)}%`}), el("span",{class:"thr"})),
-      el("b",{text:Math.round(v*100)+" %"})));
-  }
-  return box;
-}
-function padsBlock(pads){
-  const tbl = el("table"), head = el("tr");
-  for (const h of ["Paramètre","Niveau","Statut","Lecture","Confiance"]) head.append(el("th",{text:h}));
-  tbl.append(head);
-  for (const p of pads){
-    let cls="p-unk", st="Indéterminé";
-    if (p.status==="ok"){ cls = p.normal?"p-ok":"p-abn"; st = p.normal?"Normal":"Anormal"; }
-    tbl.append(el("tr",{}, el("td",{text:p.label}), el("td",{text:p.level ?? "—"}),
-      el("td",{}, el("span",{class:"pill "+cls,text:st})), el("td",{text:fmtTime(p.read_time_s)}),
-      el("td",{}, el("div",{class:"meter"}, el("i",{style:`width:${Math.round(p.confidence*100)}%`})))));
-  }
-  return el("div",{class:"card"}, el("h2",{text:"Résultats par paramètre"}), el("div",{style:"overflow-x:auto"}, tbl));
-}
-const figure = (src,cap) => el("figure",{}, el("img",{src,alt:cap}), el("figcaption",{text:cap}));
-
-function render(d){
-  const box = $("#result"); box.replaceChildren();
-  const s = d.summary;
-  const ban = el("div",{class:"banner b-"+s.level}, el("h3",{text:s.headline}));
-  const ul = el("ul"); for (const t of s.details) ul.append(el("li",{text:t})); ban.append(ul);
-  box.append(ban);
-
-  const row = el("div",{class:"grid"});
-  row.append(qualityBlock(d.quality));
-  if (d.status==="ok") row.append(padsBlock(d.pads)); else row.style.gridTemplateColumns="1fr";
-  box.append(row);
-
-  const copy = {...d}; delete copy.images; LAST = copy;
-  if (d.status==="ok"){
-    const acts = el("div",{class:"row-actions"});
-    const pdf = el("button",{class:"primary",text:"📄 Télécharger le rapport PDF"});
-    pdf.onclick = () => download("/api/report",{patient_id:$("#pid").value.trim(),date:nowText(),result:LAST},"rapport_kromamed.pdf");
-    const save = el("button",{text:"💾 Enregistrer dans l'historique"});
-    save.onclick = () => { saveHistory(); save.textContent="✓ Enregistré"; save.disabled=true; };
-    acts.append(pdf, save); box.append(acts);
-  }
-
-  const im = d.images, imgs = el("div",{class:"imgs"});
-  if (im.input) imgs.append(figure(im.input,"Photo analysée"));
-  if (im.card_raw) imgs.append(figure(im.card_raw,"Carte redressée (avant correction)"));
-  if (im.card_result) imgs.append(figure(im.card_result,"Après correction + lecture"));
-  else if (im.card_corrected) imgs.append(figure(im.card_corrected,"Carte corrigée"));
-  box.append(el("div",{class:"card",style:"margin-top:16px"}, el("h2",{text:"Ce que voit le moteur"}), imgs));
-  box.append(el("details",{}, el("summary",{text:`Détails techniques (JSON) · ${Math.round(d.duration_ms)} ms de calcul`}), el("pre",{text:JSON.stringify(copy,null,2)})));
-  box.hidden = false; box.scrollIntoView({behavior:"smooth",block:"start"});
-}
-
-/* ---------- historique (navigateur) ---------- */
-function loadHistory(){ try{ return JSON.parse(localStorage.getItem(HKEY)||"[]"); }catch(e){ return []; } }
-function storeHistory(h){ try{ localStorage.setItem(HKEY, JSON.stringify(h.slice(-200))); }catch(e){} }
-function saveHistory(){
-  if (!LAST || LAST.status!=="ok") return;
-  const results = {}; let abn = 0;
-  for (const p of LAST.pads){ results[p.param] = p.level; if (p.normal===false) abn++; }
-  const h = loadHistory();
-  h.push({date:nowText(), patient_id:$("#pid").value.trim(), results, abnormal:abn, headline:LAST.summary.headline});
-  storeHistory(h); renderHistory();
-}
-function renderHistory(){
-  const h = loadHistory(), card = $("#histCard");
-  card.hidden = h.length===0; if (!h.length) return;
-  const t = $("#histTable"); t.replaceChildren();
-  const head = el("tr"); for (const x of ["Date","Identifiant","Résultat"]) head.append(el("th",{text:x})); t.append(head);
-  for (const r of h.slice().reverse().slice(0,20))
-    t.append(el("tr",{}, el("td",{text:r.date}), el("td",{text:r.patient_id||"ANONYME"}),
-      el("td",{text: r.abnormal ? `${r.abnormal} anomalie(s)` : "Aucune anomalie"})));
-}
-$("#histXlsx").onclick = () => download("/api/history/xlsx",{rows:loadHistory()},"historique_kromamed.xlsx");
-$("#histClear").onclick = () => { if (confirm("Effacer tout l'historique de cet appareil ?")){ storeHistory([]); renderHistory(); } };
-
-/* ---------- minuteur ---------- */
-let t0 = null, tick = null, beeped = {};
-function beep(){ try{ const c=new (window.AudioContext||window.webkitAudioContext)(), o=c.createOscillator(), g=c.createGain();
-  o.connect(g); g.connect(c.destination); o.frequency.value=880; g.gain.value=.15; o.start(); setTimeout(()=>{o.stop(); c.close();},350);}catch(e){} }
-function updateTimer(){
-  const s = Math.floor((Date.now()-t0)/1000), clock=$("#clock"), msg=$("#tmsg");
-  clock.textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
-  $("#tbar").style.width = Math.min(100, s/120*100)+"%";
-  let cls="wait", text="Attendez… la photo se prend à 60 s.";
-  if (s>=120){ cls="late"; text="2 min : les leucocytes sont lisibles. Reprenez une photo pour eux si possible."; if(!beeped[120]){beeped[120]=1;beep();} }
-  else if (s>=60){ cls="go"; text="Photographiez maintenant (60 s)."; if(!beeped[60]){beeped[60]=1;beep();} }
-  clock.className="clock "+cls; msg.textContent=text;
-}
-$("#tstart").onclick = () => { t0=Date.now(); beeped={}; clearInterval(tick); tick=setInterval(updateTimer,250); updateTimer(); $("#treset").disabled=false; };
-$("#treset").onclick = () => { clearInterval(tick); t0=null; $("#clock").textContent="0:00"; $("#clock").className="clock"; $("#tbar").style.width="0"; $("#tmsg").textContent="Prêt."; $("#treset").disabled=true; };
-
-/* ---------- initialisation ---------- */
-async function init(){
-  renderHistory();
-  try{
-    const list = await (await fetch("/api/scenarios")).json();
-    const holder = $("#scenarios"); holder.replaceChildren();
-    for (const s of list){
-      const b = el("button",{class:s.label.includes("refusée")?"bad":"",text:s.label});
-      b.onclick = () => call("/api/demo/"+s.id); holder.append(b);
-    }
-  }catch(e){ $("#scenarios").textContent = "Impossible de charger les démos."; }
-}
-for (const id of ["#cam","#pick"]){
-  $(id).addEventListener("change",(ev)=>{
-    const f = ev.target.files[0]; if (!f) return;
-    const fd = new FormData(); fd.append("file", f);
-    call("/api/analyze",{method:"POST",body:fd}); ev.target.value="";
-  });
-}
-init();
-</script>
+  <div id="sheet" hidden></div>
+  <div id="toast" hidden></div>
+  <div id="busy" hidden><b></b><span id="busy-text">Analyse en cours…</span></div>
+  <input type="file" id="f-gallery" accept="image/*" hidden>
+  <input type="file" id="f-native" accept="image/*" capture="environment" hidden>
+  <input type="file" id="f-restore" accept="application/json,.json" hidden>
+</div>
+<script src="/static/app.js"></script>
 </body>
 </html>

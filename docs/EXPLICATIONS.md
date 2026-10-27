@@ -52,6 +52,20 @@ on corrige les couleurs de la bandelette, puis on les compare à une table de r�
 - L'historique est gardé dans le navigateur (`localStorage`) : le serveur ne conserve aucune donnée de santé.
 - Le minuteur est dans `web/index.html` (JavaScript) : il compte jusqu'à 2 min et sonne à 60 s et 120 s.
 
+## Livraison 4 : l'application mobile (dossier `web/`)
+- `index.html` : la structure. Un « écran » par fonction (`s-home`, `s-test`, `s-camera`, `s-result`, `s-history`,
+  `s-guide`, `s-profile`) et la barre du bas. Un seul est visible à la fois.
+- `static/app.css` : tout le design. Les couleurs sont en haut du fichier (`:root`) : jaune, vert, crème.
+- `static/app.js` : le comportement, en 9 parties numérotées (outils, icônes, mémoire du téléphone, messages,
+  appels au serveur, navigation, écrans, caméra + minuteur, boutons). Chaque bouton porte `data-act="nom"`
+  et la fonction du même nom se trouve dans l'objet `ACT`.
+- `sw.js` + `manifest.webmanifest` : permettent d'installer le site comme une application. Le service worker ne met
+  JAMAIS l'API en cache.
+- `static/icons/`, `static/fonts/` : icônes de l'application et police (hébergée avec le site, licence OFL).
+- Le **Profil** (nom, historique, sauvegarde) vit dans `localStorage`, la mémoire du navigateur de votre téléphone.
+- **Photo de test (réglage)** : ouvre la caméra sans minuteur et affiche tous les contrôles qualité. C'est l'outil pour
+  régler les seuils avec de vraies photos (voir `docs/TESTER_SUR_TELEPHONE.md`).
+
 ## Les scripts (`scripts/`)
 - `run.py` : analyse une photo, écrit `out/resultat.json` + images (carte redressée, carte corrigée, résultat annoté).
 - `benchmark.py` : 100 photos simulées → taux de bonnes lectures + cas qui doivent être refusés.
@@ -59,7 +73,7 @@ on corrige les couleurs de la bandelette, puis on les compare à une table de r�
 - `make_demo.py` : crée une photo de démonstration.
 
 ## Les tests (`tests/test_pipeline.py`)
-19 vérifications automatiques du moteur (+ 14 pour l'API) : repères trouvés, niveaux retrouvés sous différentes lumières, refus du flou,
+19 vérifications automatiques du moteur (+ 16 pour l'API et l'application) : repères trouvés, niveaux retrouvés sous différentes lumières, refus du flou,
 refus si un repère est caché, refus d'une ombre forte, refus d'une photo sans carte, couleurs inconnues
 déclarées « indéterminées », niveaux de la table assez distincts. `pytest -q` doit afficher `17 passed`.
 

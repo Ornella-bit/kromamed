@@ -1,0 +1,17 @@
+{
+  "name": "KromaMed",
+  "short_name": "KromaMed",
+  "description": "Lecture de bandelettes urinaires Multistix 10 SG avec un smartphone.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF7EF",
+  "theme_color": "#F2B134",
+  "lang": "fr",
+  "icons": [
+    { "src": "/static/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/static/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

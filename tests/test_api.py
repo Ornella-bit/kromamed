@@ -17,7 +17,29 @@ def test_sante():
 
 def test_page_d_accueil():
     r = client.get("/")
-    assert r.status_code == 200 and "KROMA" in r.text
+    assert r.status_code == 200 and "KromaMed" in r.text and "/static/app.js" in r.text
+
+
+def test_application_installable_manifest_et_service_worker():
+    m = client.get("/manifest.webmanifest")
+    assert m.status_code == 200
+    data = m.json()
+    assert data["display"] == "standalone" and data["theme_color"] == "#F2B134"
+    for icon in data["icons"]:                       # chaque icône annoncée existe vraiment
+        assert client.get(icon["src"]).status_code == 200
+    sw = client.get("/sw.js")
+    assert sw.status_code == 200 and "javascript" in sw.headers["content-type"]
+    assert "/api/" in sw.text                        # le service worker exclut l'API du cache
+
+
+def test_ecrans_et_fichiers_de_l_application():
+    html = client.get("/").text
+    for ecran in ("s-home", "s-test", "s-camera", "s-result", "s-history", "s-guide", "s-profile"):
+        assert f'id="{ecran}"' in html
+    assert "Profil" in html and "Réglages" not in html
+    for fichier in ("/static/app.js", "/static/app.css", "/static/maquette_mobile.png",
+                    "/static/fonts/plus-jakarta-sans-latin-700-normal.woff2"):
+        assert client.get(fichier).status_code == 200
 
 
 def test_liste_des_scenarios():

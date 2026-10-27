@@ -1,4 +1,4 @@
-# KromaMed — moteur de vision + API + démo web (Livraisons 1 à 3)
+# KromaMed — application mobile + API + moteur de vision (Livraisons 1 à 4)
 
 Lecture colorimétrique de bandelettes urinaires à partir d'une simple photo de smartphone.
 Ce dépôt contient le **moteur de vision en Python/OpenCV** : il redresse la photo, corrige la lumière
@@ -8,6 +8,14 @@ d'analyser** si la photo n'est pas assez fiable (seuil 85 %).
 > **État honnête du projet** : validé sur 100 photos **simulées** (700/700 plages correctes, cas
 > dégradés refusés). Pas encore validé sur de vraies photos ni cliniquement. Voir « Limites » plus bas.
 > KromaMed est une aide à la lecture, pas un diagnostic.
+
+## Application mobile (installable sur téléphone)
+![Accueil, scan avec minuteur, résultat](web/static/maquette_mobile.png)
+
+Écrans : **Accueil**, **Nouveau test** (préparation, caméra, minuteur de 60 s), **Résultat**, **Historique**, **Guide**, **Profil**
+(nom, à propos, sauvegarde/restauration, suppression des tests, photo de test pour le réglage).
+Ouvrez l'adresse du site sur un téléphone, puis « Ajouter à l'écran d'accueil » : elle s'installe comme une application.
+Voir `docs/TESTER_SUR_TELEPHONE.md`. Captures d'écran : `docs/img/`.
 
 ## 1. Ouvrir dans VS Code
 1. Dézipper le dossier, puis dans VS Code : **Fichier → Ouvrir le dossier…** → `kromamed-vision`.
@@ -32,7 +40,7 @@ python scripts/make_demo.py                         # crée une photo simulée d
 python scripts/run.py data/demo/photo_demo.png      # analyse -> out/resultat.json + images annotées
 python scripts/benchmark.py                         # 100 photos simulées + cas à refuser
 python scripts/make_card.py                         # carte d'étalonnage à imprimer (out/carte_etalonnage.png)
-pytest -q                                           # 33 tests automatiques (moteur + API)
+pytest -q                                           # 35 tests automatiques (moteur + API + application)
 ```
 Pour analyser **votre propre photo** : `python scripts/run.py chemin/vers/photo.jpg`
 (la photo doit montrer la carte imprimée avec ses 4 repères noirs et la bandelette posée dans sa fente).
@@ -70,7 +78,7 @@ Ensuite, après chaque livraison : `git add . && git commit -m "message" && git 
 ## 5. API
 | Route | Rôle |
 |---|---|
-| `GET /` | page de démo |
+| `GET /` | l'application mobile (+ `/manifest.webmanifest`, `/sw.js` pour l'installation) |
 | `GET /api/scenarios`, `GET /api/demo/{id}` | photos simulées analysées (dont cas à refuser) |
 | `POST /api/analyze` | envoyer une photo (champ `file`) → résultat JSON + images annotées |
 | `POST /api/report` | rapport PDF (le navigateur renvoie le résultat ; rien n'est stocké) |

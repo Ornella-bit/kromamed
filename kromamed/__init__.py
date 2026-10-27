@@ -2,4 +2,4 @@
 from .pipeline import analyze, AnalysisResult
 
 __all__ = ["analyze", "AnalysisResult"]
-__version__ = "0.1.0"
+__version__ = "0.4.0"

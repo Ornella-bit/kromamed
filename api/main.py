@@ -195,3 +195,14 @@ app.mount("/static", StaticFiles(directory=WEB / "static"), name="static")
 @app.get("/", include_in_schema=False)
 def home() -> FileResponse:
     return FileResponse(WEB / "index.html")
+
+
+@app.get("/sw.js", include_in_schema=False)
+def service_worker() -> FileResponse:
+    """Doit être servi à la racine pour couvrir tout le site (installation comme application)."""
+    return FileResponse(WEB / "sw.js", media_type="text/javascript", headers={"Cache-Control": "no-cache"})
+
+
+@app.get("/manifest.webmanifest", include_in_schema=False)
+def manifest() -> FileResponse:
+    return FileResponse(WEB / "manifest.webmanifest", media_type="application/manifest+json")
