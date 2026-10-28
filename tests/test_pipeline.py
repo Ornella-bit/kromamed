@@ -86,3 +86,31 @@ def test_niveaux_voisins_assez_distincts():
         for i in range(len(labs)):
             for j in range(i + 1, len(labs)):
                 assert delta_e(labs[i], labs[j]) >= 10, (param, levels[i][0], levels[j][0])
+
+
+def test_carte_vide_sans_bandelette_est_refusee():
+    """Une carte sans bandelette ne doit JAMAIS produire de lecture (le papier ressemble à un résultat « négatif »)."""
+    img = simulate_photo(seed=5, with_strip=False)
+    res = analyze(img)
+    assert res.status == "rejected" and res.pads == []
+    assert res.quality.strip == 0.0 and any("bandelette" in r for r in res.quality.reasons)
+    assert analyze(img, require_strip=False).quality.strip == 1.0       # mode « photo de test »
+
+
+def test_vraie_carte_imprimee_photographiee():
+    """Photo RÉELLE d'une carte imprimée sur une imprimante de bureau (envoyée par WhatsApp : image réduite).
+    Régression : l'ancien étalonnage par couleurs imprimées donnait 0 % ; la référence est maintenant le papier."""
+    import cv2
+    from pathlib import Path
+    img = cv2.imread(str(Path(__file__).parent / "data" / "carte_imprimee_reelle.jpg"))
+    q = analyze(img, require_strip=False).quality
+    assert q.markers == 1.0 and q.calibration >= 0.85 and q.illumination >= 0.85 and q.exposure >= 0.85
+    assert analyze(img).quality.strip == 0.0                              # carte vide : pas de bandelette
+
+
+def test_lumiere_tres_coloree_ou_delavee_est_signalee():
+    import cv2
+    img = simulate_photo(seed=6)
+    washed = cv2.addWeighted(img, 0.35, np.full_like(img, 230), 0.65, 0)  # photo délavée (reflet)
+    q = analyze(washed).quality
+    assert q.overall < 0.85

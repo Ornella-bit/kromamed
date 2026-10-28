@@ -42,3 +42,11 @@ def correct_illumination(rgb_lin: np.ndarray, mask: np.ndarray) -> tuple[np.ndar
     """Retourne (image_corrigée, surface)."""
     surface = fit_illumination(rgb_lin, mask)
     return rgb_lin / surface, surface
+
+
+def fit_residual(rgb_lin: np.ndarray, surface: np.ndarray, mask: np.ndarray) -> float:
+    """Écart-type de (papier mesuré / surface lisse). Faible = éclairage lisse, bien décrit par la surface.
+    Élevé = ombre nette, doigt, pli : la correction n'est plus fiable."""
+    lum = np.array([0.2126, 0.7152, 0.0722], np.float32)
+    ratio = (rgb_lin @ lum)[mask] / np.maximum((surface @ lum)[mask], 1e-4)
+    return float(np.std(ratio))

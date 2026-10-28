@@ -1,5 +1,13 @@
 """
-Étalonnage des couleurs (feuille de route §4, étape 3).
+Contrôle de la lumière et du contraste (feuille de route §4, étape 3).
+
+IMPORTANT (leçon d'un test sur une vraie carte imprimée) : les couleurs imprimées par une imprimante de
+bureau sont très différentes des couleurs « idéales » (un vert sort 4 fois plus sombre, les gris ont une
+teinte). Forcer ces couleurs à leurs valeurs idéales déformait toute l'image. La référence fiable est le
+PAPIER BLANC (déjà utilisé par illumination.py : le papier devient blanc partout, ce qui corrige aussi la
+teinte de la lumière). Ici, on ne fait que CONTRÔLER la capture avec des critères qui ne dépendent pas
+de l'imprimante : contraste noir/blanc, dominante de couleur, ordre des gris.
+Les anciennes fonctions d'ajustement par matrice 3x3 sont conservées plus bas pour les essais en laboratoire.
 
 On mesure la couleur de chaque patch de référence dans la photo (déjà
 corrigée de l'éclairage), on connaît sa vraie couleur, et on cherche la
@@ -43,3 +51,47 @@ def calibrate(img_illum_corrected: np.ndarray) -> tuple[np.ndarray, np.ndarray, 
     after = measure_patches(out)
     err = float(np.mean(delta_e(linear_to_lab(after), linear_to_lab(reference))))
     return out, M, err
+
+
+
+# ---------------------------------------------------------------------------
+# Contrôles utilisés par le pipeline
+# ---------------------------------------------------------------------------
+_LUM = np.array([0.2126, 0.7152, 0.0722], np.float32)
+
+
+def _clip01(x: float) -> float:
+    return float(min(1.0, max(0.0, x)))
+
+
+def assess(raw_warped: np.ndarray, corrected: np.ndarray, paper: np.ndarray) -> dict:
+    """3 contrôles, chacun noté de 0 à 1 ; la note globale est la plus basse.
+
+    contrast : rapport blanc/noir des 4 repères (photo délavée, reflet, flou -> note basse)
+    cast     : dominante de couleur du papier AVANT correction (lumière très colorée -> note basse)
+    order    : les 5 gris imprimés doivent rester du plus clair au plus foncé (exposition aberrante -> basse)
+    """
+    lum = raw_warped @ _LUM
+    vals = np.concatenate([lum[y:y + C.MARKER_SIZE, x:x + C.MARKER_SIZE].ravel() for x, y in C.MARKERS.values()])
+    black, white = max(float(np.percentile(vals, 5)), 1e-4), float(np.percentile(vals, 95))
+    contrast = white / black
+    s_contrast = _clip01((np.log10(contrast) - 0.7) / 0.5)          # 5:1 -> 0 ; 16:1 et plus -> 1
+
+    paper_rgb = raw_warped[paper].mean(axis=0)
+    cast = float(paper_rgb.max() / max(float(paper_rgb.min()), 1e-4))
+    s_cast = _clip01((3.0 - cast) / 1.2)                              # 1,8 et moins -> 1 ; 3,0 -> 0
+
+    grays = [float(_patch_median(corrected, C.patch_rect(i)) @ _LUM) for i in range(5)]
+    ratios = [grays[i] / max(grays[i + 1], 1e-4) for i in range(4)]
+    s_order = _clip01((min(ratios) - 1.05) / 0.25)                    # 1,3 et plus -> 1 ; 1,05 -> 0
+
+    return {"score": min(s_contrast, s_cast, s_order), "contrast": contrast, "cast": cast, "min_gray_ratio": min(ratios),
+            "scores": {"contrast": s_contrast, "cast": s_cast, "order": s_order}}
+
+
+def strip_score(pad_lab: np.ndarray) -> tuple[float, int]:
+    """Y a-t-il une bandelette ? Au moins 4 plages doivent différer nettement du papier blanc (ΔE >= 12).
+    Une carte vide donne 0 : on refuse plutôt que de « lire » du papier."""
+    white = np.array([100.0, 0.0, 0.0], np.float32)
+    n = int(sum(float(delta_e(lab, white)) >= 12.0 for lab in pad_lab))
+    return _clip01((n - 2) / 2.0), n

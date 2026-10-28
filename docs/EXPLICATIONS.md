@@ -9,8 +9,8 @@ on corrige les couleurs de la bandelette, puis on les compare à une table de r�
 1. **Trouver la carte** : 4 repères noir et blanc (ArUco) aux coins.
 2. **Redresser** : on remet la carte « bien droite » même si la photo est de travers (homographie).
 3. **Corriger la lumière** : le papier doit être blanc partout ; s'il est plus sombre d'un côté, on rattrape.
-4. **Corriger les couleurs** : 10 carrés de couleurs connues servent à calculer une matrice de correction.
-5. **Contrôler la qualité** : flou, éclairage, repères visibles… Sous 85 %, **on refuse** et on explique pourquoi.
+4. **Contrôler la lumière** : contraste noir/blanc, dominante de couleur, ordre des gris. Le papier blanc est la référence (les couleurs imprimées varient trop d'une imprimante à l'autre).
+5. **Contrôler la qualité** : flou, éclairage, repères visibles, bandelette présente… Sous 85 %, **on refuse** et on explique pourquoi.
 6. **Lire chaque plage** : couleur médiane de la plage, puis comparaison avec la table de référence.
 7. **Rendre le résultat** : niveau (négatif, +, ++…), confiance, ou « indéterminé » si on hésite.
 
@@ -20,7 +20,7 @@ on corrige les couleurs de la bandelette, puis on les compare à une table de r�
 | `config.py` | Tout ce qui se règle : taille de la carte, positions, couleurs de référence, seuils | Changer de bandelette ou de carte |
 | `card.py` | Dessine la carte ; détecte les repères ; redresse la photo | Changer la disposition de la carte |
 | `illumination.py` | Estime la lumière (surface lisse) et la retire | Rarement |
-| `calibration.py` | Calcule la matrice 3x3 de correction des couleurs avec les 10 carrés | Rarement |
+| `calibration.py` | Contrôles de lumière et de contraste ; détection de la bandelette | Pour régler les seuils |
 | `color.py` | Conversions de couleurs (sRGB, linéaire, L*a*b*) et écart ΔE | Jamais, sauf passer à ΔE2000 |
 | `quality.py` | Les 5 contrôles qualité et le score global (le pire gagne) | Recaler les seuils sur de vraies photos |
 | `interpreter.py` | Classification KNN : couleur → niveau, avec refus si doute | Phase 3 : ajouter des échantillons mesurés |
@@ -73,7 +73,7 @@ on corrige les couleurs de la bandelette, puis on les compare à une table de r�
 - `make_demo.py` : crée une photo de démonstration.
 
 ## Les tests (`tests/test_pipeline.py`)
-19 vérifications automatiques du moteur (+ 16 pour l'API et l'application) : repères trouvés, niveaux retrouvés sous différentes lumières, refus du flou,
+22 vérifications automatiques du moteur (+ 16 pour l'API et l'application) : repères trouvés, niveaux retrouvés sous différentes lumières, refus du flou,
 refus si un repère est caché, refus d'une ombre forte, refus d'une photo sans carte, couleurs inconnues
 déclarées « indéterminées », niveaux de la table assez distincts. `pytest -q` doit afficher `17 passed`.
 

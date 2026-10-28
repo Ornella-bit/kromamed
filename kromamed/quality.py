@@ -19,7 +19,8 @@ class QualityReport:
     sharpness: float      # netteté (variance du Laplacien sur les marqueurs)
     exposure: float       # pas de zones brûlées / trop sombres
     illumination: float   # inégalité d'éclairage raisonnable
-    calibration: float    # erreur de couleur résiduelle sur les patchs
+    calibration: float    # contraste, dominante de couleur et ordre des gris (voir calibration.assess)
+    strip: float          # bandelette présente dans la fente ?
     overall: float
     reasons: list[str]
 
@@ -62,20 +63,27 @@ def illumination_score(surface: np.ndarray, paper: np.ndarray) -> float:
     return _clip01((r - 0.35) / 0.30)
 
 
+def residual_score(std: float) -> float:
+    """Éclairage lisse (écart-type <= 0,025) -> 1.0 ; ombre nette (>= 0,05) -> 0.0.
+    Mesuré : photos normales <= 0,02 ; vraie carte imprimée 0,010."""
+    return _clip01((0.05 - std) / 0.025)
+
+
 def calibration_score(mean_delta_e: float) -> float:
     """ΔE moyen ≤ 2 -> 1.0 ; ΔE ≥ 10 -> 0.0."""
     return _clip01(1.0 - (mean_delta_e - 2.0) / 8.0)
 
 
-def combine(markers: float, sharp: float, expo: float, illum: float, calib: float) -> QualityReport:
+def combine(markers: float, sharp: float, expo: float, illum: float, calib: float, strip: float = 1.0) -> QualityReport:
     scores = dict(markers=markers, sharpness=sharp, exposure=expo,
-                  illumination=illum, calibration=calib)
+                  illumination=illum, calibration=calib, strip=strip)
     messages = {
         "markers": "Les 4 repères de la carte ne sont pas tous visibles : recentrer la carte.",
         "sharpness": "Image floue : stabiliser le téléphone.",
         "exposure": "Éclairage trop fort ou trop faible : changer d'endroit.",
         "illumination": "Éclairage trop inégal (ombre) : éviter les ombres sur la carte.",
-        "calibration": "Couleurs de référence mal reconnues : refaire la photo.",
+        "calibration": "Photo délavée ou lumière trop colorée : refaire la photo à la lumière du jour.",
+        "strip": "Aucune bandelette détectée : posez la bandelette dans la fente de la carte.",
     }
     overall = min(scores.values())
     reasons = [messages[k] for k, v in scores.items() if v < C.MIN_QUALITY]

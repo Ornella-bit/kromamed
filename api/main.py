@@ -151,12 +151,12 @@ def demo(scenario: str) -> dict:
 
 
 @app.post("/api/analyze")
-def analyze_upload(file: UploadFile = File(...)) -> dict:
+def analyze_upload(file: UploadFile = File(...), require_strip: bool = True) -> dict:
     data = file.file.read(MAX_UPLOAD_BYTES + 1)
     if len(data) > MAX_UPLOAD_BYTES:
         raise HTTPException(status_code=413, detail="Photo trop lourde (12 Mo maximum).")
     img = _decode(data)
-    return _response(analyze(img, keep_debug=True), img)
+    return _response(analyze(img, keep_debug=True, require_strip=require_strip), img)
 
 
 class ReportRequest(BaseModel):

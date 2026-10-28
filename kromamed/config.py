@@ -102,27 +102,28 @@ def pad_rect(index: int) -> tuple[int, int, int, int]:
 
 # --- Table de référence des couleurs ------------------------------------
 # sRGB hexadécimal par niveau. VALEURS DE DÉMONSTRATION (approximatives).
-# En production : remplacer par la table du fabricant ou des mesures (Phase 3).
+# Les niveaux « négatif / normal » reprennent les teintes de la bandelette Multistix 10 SG (image du fabricant,
+# bandelette sèche). Les autres niveaux restent approximatifs. En production : table du fabricant ou mesures (Phase 3).
 REFERENCE_TABLE = {
-    "leucocytes": [("négatif", "#E9E3C0"), ("traces", "#D9CBC0"),
+    "leucocytes": [("négatif", "#E7E7E7"), ("traces", "#D9CBC0"),
                    ("+", "#C7A9C0"), ("++", "#A97FAE"), ("+++", "#7F4F8F")],
-    "nitrites":   [("négatif", "#F1ECDD"), ("positif", "#EBA0B4")],
-    "urobilinogene": [("normal", "#F2C9A0"), ("+", "#EFA98A"),
+    "nitrites":   [("négatif", "#DBDBDB"), ("positif", "#EBA0B4")],
+    "urobilinogene": [("normal", "#E9D0A6"), ("+", "#EFA98A"),
                       ("++", "#E58A78"), ("+++", "#D86A66")],
-    "proteines":  [("négatif", "#E3E49A"), ("traces", "#C9D9A0"),
+    "proteines":  [("négatif", "#DAD7BE"), ("traces", "#C9D9A0"),
                    ("+", "#A9CFA6"), ("++", "#7FBFAF"), ("+++", "#4FA9B5")],
     "ph":         [("5,0", "#E8A24A"), ("6,0", "#D9B84F"), ("6,5", "#B8BE52"),
                    ("7,0", "#8CB468"), ("8,0", "#5FA88A"), ("8,5", "#4B8FA6")],
-    "sang":       [("négatif", "#E6D77A"), ("traces", "#BCCB72"),
+    "sang":       [("négatif", "#E3C16D"), ("traces", "#BCCB72"),
                    ("+", "#8DBA70"), ("++", "#5FA575"), ("+++", "#2F7F66")],
     "densite":    [("1,000", "#219AA3"), ("1,005", "#59A099"), ("1,010", "#79A78E"),
                    ("1,015", "#93AE83"), ("1,020", "#ABB477"), ("1,025", "#C0BB6B"),
                    ("1,030", "#D4C25D")],
-    "cetones":    [("négatif", "#EDD9C3"), ("traces", "#E5BBB4"),
+    "cetones":    [("négatif", "#DCCDC6"), ("traces", "#E5BBB4"),
                    ("+", "#D08CA2"), ("++", "#9E5A86")],
-    "bilirubine": [("négatif", "#F1E6D0"), ("+", "#E4CBA6"),
+    "bilirubine": [("négatif", "#E1E0DC"), ("+", "#E4CBA6"),
                    ("++", "#D2AE8E"), ("+++", "#B98770")],
-    "glucose":    [("négatif", "#9CC4D8"), ("+", "#8FB59B"),
+    "glucose":    [("négatif", "#B7DFE7"), ("+", "#8FB59B"),
                    ("++", "#B59A58"), ("+++", "#8A5A3A")],
 }
 
@@ -144,5 +145,5 @@ NORMAL_DEFAULT = {
 # --- Seuils -------------------------------------------------------------
 MIN_QUALITY = 0.85          # sous ce seuil : refus d'analyser
 MAX_PAD_DELTA_E = 12.0      # couleur trop loin de toute référence -> "indéterminé"
-MIN_PAD_MARGIN = 0.15       # marge entre 1er et 2e voisin
+MIN_PAD_MARGIN = 0.25       # marge entre 1er et 2e voisin (prudence : mieux vaut « indéterminé » qu'un niveau faux)
 KNN_K = 1

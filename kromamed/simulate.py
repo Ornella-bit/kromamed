@@ -25,11 +25,11 @@ def random_levels(rng: np.random.Generator) -> dict[str, str]:
 def simulate_photo(levels: dict[str, str] | None = None, seed: int = 0, *,
                    blur_sigma: float = 0.0, shadow: float = 0.08,
                    warm: float = 0.25, tilt: float = 1.0,
-                   hide_marker: int | None = None, scene=(1200, 1500)) -> np.ndarray:
+                   hide_marker: int | None = None, with_strip: bool = True, scene=(1200, 1500)) -> np.ndarray:
     """Retourne une photo BGR uint8."""
     rng = np.random.default_rng(seed)
     S = 2  # rendu 2x pour des bords nets
-    card = render_card(levels)
+    card = render_card(levels, with_strip=with_strip)
     card = cv2.resize(card, None, fx=S, fy=S, interpolation=cv2.INTER_NEAREST)
     H, W = card.shape[:2]
 
@@ -45,7 +45,7 @@ def simulate_photo(levels: dict[str, str] | None = None, seed: int = 0, *,
     img = card * light[..., None] * cast
 
     # mélange de canaux de la caméra (diaphonie)
-    cam = np.array([[0.92, 0.05, 0.03], [0.04, 0.92, 0.04], [0.02, 0.06, 0.92]], np.float32)
+    cam = np.array([[0.96, 0.025, 0.015], [0.02, 0.96, 0.02], [0.01, 0.03, 0.96]], np.float32)   # un téléphone renvoie déjà des couleurs proches de sRGB
     img = (img @ cam.T).astype(np.float32)
 
     # --- placement en perspective dans la scène ----------------------------

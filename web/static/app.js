@@ -160,9 +160,9 @@ function renderHome() {
 function renderTest() { $("#pid").value = S.pidKeep && S.pid ? S.pid : nextId(); }
 
 function qualityHTML(q) {
-  const CRIT = [["markers", "Repères visibles"], ["sharpness", "Netteté"], ["exposure", "Exposition"], ["illumination", "Éclairage uniforme"], ["calibration", "Étalonnage couleurs"]];
-  return CRIT.map(([k, label]) => {
-    const v = q[k] ?? 0;
+  const CRIT = [["markers", "Repères visibles"], ["sharpness", "Netteté"], ["exposure", "Exposition"], ["illumination", "Éclairage uniforme"], ["calibration", "Lumière et contraste"], ["strip", "Bandelette détectée"]];
+  return CRIT.filter(([k]) => q[k] !== undefined).map(([k, label]) => {
+    const v = q[k];
     return `<div class="q${v < 0.85 ? " fail" : ""}"><span>${label}</span><div class="meter"><i style="width:${Math.round(v * 100)}%"></i><u></u></div><b>${Math.round(v * 100)} %</b></div>`;
   }).join("");
 }
@@ -287,7 +287,7 @@ async function analyzeBlob(blob) {
   setBusy(true);
   try {
     const fd = new FormData(); fd.append("file", blob, "photo.jpg");
-    S.current = { data: await api("/api/analyze", { method: "POST", body: fd }), source: "camera" };
+    S.current = { data: await api("/api/analyze" + (S.testMode ? "?require_strip=false" : ""), { method: "POST", body: fd }), source: "camera" };
     go("#/result");
   } catch (e) { toast(e.message, true); } finally { setBusy(false); }
 }

@@ -19,8 +19,8 @@
 ## 4. Réglage avec de vraies photos (quand la carte est imprimée)
 1. **Profil → Paramètres → Photo de test (réglage)**.
 2. Posez la carte imprimée à plat, lumière naturelle, et photographiez-la.
-3. Le résultat affiche les 5 contrôles qualité en détail (repères, netteté, exposition, éclairage, étalonnage) et les images
-   vues par le moteur. Faites une capture d'écran.
+3. Le résultat affiche les 6 contrôles qualité en détail (repères, netteté, exposition, éclairage, lumière et contraste, bandelette) et les images
+   vues par le moteur. En mode test, la **bandelette n'est pas exigée** : photographiez la carte seule. Faites une capture d'écran.
 4. Répétez avec 3 lumières (fenêtre, ombre, lampe) et envoyez-moi les captures : je règle les seuils d'après vos résultats.
 
 ## Si quelque chose ne marche pas

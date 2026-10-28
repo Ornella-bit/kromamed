@@ -66,8 +66,10 @@ def _reject(markers_score: float, reasons: list[str] | None = None, t0: float = 
     return AnalysisResult("rejected", q, duration_ms=(time.perf_counter() - t0) * 1000)
 
 
-def analyze(image: np.ndarray | str | Path, keep_debug: bool = False) -> AnalysisResult:
-    """Analyse une photo (tableau BGR uint8 ou chemin de fichier)."""
+def analyze(image: np.ndarray | str | Path, keep_debug: bool = False, require_strip: bool = True) -> AnalysisResult:
+    """Analyse une photo (tableau BGR uint8 ou chemin de fichier).
+
+    require_strip=False : mode « photo de test » (carte seule, sans bandelette) pour régler la caméra."""
     t0 = time.perf_counter()
     if not isinstance(image, np.ndarray):
         image = cv2.imread(str(image))
@@ -83,9 +85,15 @@ def analyze(image: np.ndarray | str | Path, keep_debug: bool = False) -> Analysi
     warped, _ = card.rectify(rgb_lin, markers)
     paper = card.paper_mask()
 
-    # --- 2. Normalisation ------------------------------------------------
+    # --- 2. Normalisation : le papier blanc est la référence (lumière + teinte) ----
     corrected, surface = illumination.correct_illumination(warped, paper)
-    calibrated, M, calib_err = calibration.calibrate(corrected)
+    calibrated = corrected
+    cal = calibration.assess(warped, corrected, paper)
+
+    # --- 3. Lecture des plages (avant le contrôle qualité : on vérifie la présence de la bandelette)
+    pad_rgb = [calibration._patch_median(calibrated, C.pad_rect(i), shrink=0.7) for i in range(len(C.PARAMS))]
+    pad_lab = [linear_to_lab(rgb.reshape(1, 3)).reshape(3) for rgb in pad_rgb]
+    strip_s, _n = calibration.strip_score(pad_lab) if require_strip else (1.0, len(pad_lab))
 
     # --- qualité ---------------------------------------------------------
     warped_srgb = linear_to_srgb(warped)
@@ -95,8 +103,10 @@ def analyze(image: np.ndarray | str | Path, keep_debug: bool = False) -> Analysi
         markers=1.0,
         sharp=sharp,
         expo=quality.exposure_score(warped_srgb, paper),
-        illum=quality.illumination_score(surface, paper),
-        calib=quality.calibration_score(calib_err),
+        illum=min(quality.illumination_score(surface, paper),
+                  quality.residual_score(illumination.fit_residual(warped, surface, paper))),
+        calib=cal["score"],
+        strip=strip_s,
     )
 
     debug = {}
@@ -108,12 +118,8 @@ def analyze(image: np.ndarray | str | Path, keep_debug: bool = False) -> Analysi
         return AnalysisResult("rejected", report,
                               duration_ms=(time.perf_counter() - t0) * 1000, debug=debug)
 
-    # --- 3 + 4. Extraction et classification -----------------------------
-    pads: list[PadResult] = []
-    for i, param in enumerate(C.PARAMS):
-        rgb = calibration._patch_median(calibrated, C.pad_rect(i), shrink=0.7)
-        lab = linear_to_lab(rgb.reshape(1, 3)).reshape(3)
-        pads.append(_INTERPRETER.classify(param, lab))
+    # --- 4. Classification ------------------------------------------------
+    pads: list[PadResult] = [_INTERPRETER.classify(param, pad_lab[i]) for i, param in enumerate(C.PARAMS)]
 
     decided = [p for p in pads if p.status == "ok"]
     all_normal = (all(p.normal for p in decided) if len(decided) == len(pads) else None)
