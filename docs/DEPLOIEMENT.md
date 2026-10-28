@@ -4,13 +4,16 @@ Résultat : une adresse du type `https://kromamed.onrender.com` à donner au jur
 ET sur téléphone (le bouton « Prendre une photo » ouvre l'appareil photo).
 
 ## Avant de commencer
+
 - Le projet est sur GitHub (voir README, section 3) et contient `Dockerfile`, `render.yaml`, `requirements-deploy.txt`.
 - Les tests passent en local : `pytest -q` → `28 passed`.
 
 ## Étapes
+
 1. Allez sur **render.com** → **Get Started** → connectez-vous avec votre compte **GitHub**.
 2. **+ New → Web Service** → choisissez votre dépôt `kromamed` (autorisez Render à y accéder si demandé).
 3. Vérifiez les champs :
+
    - **Language / Runtime** : `Docker` (Render détecte le `Dockerfile`)
    - **Instance Type** : `Free`
    - **Branch** : `main`
@@ -23,6 +26,7 @@ ET sur téléphone (le bouton « Prendre une photo » ouvre l'appareil photo).
 Alternative : **New → Blueprint** utilise directement `render.yaml`.
 
 ## À savoir (important pour le jour J)
+
 - **Mise en veille** : le gratuit s'endort après 15 minutes sans visite ; le réveil prend de quelques secondes
   à environ une minute. **Ouvrez l'adresse 5 minutes avant de présenter.**
 - **Puissance limitée** : l'offre gratuite est très petite (512 Mo, 0,1 CPU). L'analyse peut prendre quelques
@@ -31,6 +35,7 @@ Alternative : **New → Blueprint** utilise directement `render.yaml`.
 - Si le déploiement échoue : ouvrez l'onglet **Logs** et copiez-moi la dernière erreur.
 
 ## Tester Docker en local (facultatif, nécessite Docker Desktop)
+
 ```bash
 docker build -t kromamed .
 docker run -p 8000:7860 kromamed
@@ -38,5 +43,6 @@ docker run -p 8000:7860 kromamed
 ```
 
 ## Autre hébergeur possible : Hugging Face Spaces (type « Docker »)
+
 Même `Dockerfile` (port 7860 par défaut). Il faut ajouter en tête du `README.md` un bloc
 `sdk: docker` et `app_port: 7860`. Vérifiez la procédure actuelle sur la documentation de Hugging Face avant.
