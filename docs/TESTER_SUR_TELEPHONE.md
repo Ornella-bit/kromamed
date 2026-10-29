@@ -2,7 +2,7 @@
 
 ## 1. Ouvrir l'application
 1. Sur le téléphone, ouvrez Chrome (Android) ou Safari (iPhone) et allez à l'adresse Render du site
-   (`https://kromamed-xxxx.onrender.com`). L'offre gratuite s'endort : le premier chargement peut prendre une minute.
+   (`https://kromamed.onrender.com`). L'offre gratuite s'endort : le premier chargement peut prendre une minute.
 2. Installer comme une application : Chrome → menu ⋮ → **Ajouter à l'écran d'accueil** (ou « Installer l'application »).
    Safari → bouton Partager → **Sur l'écran d'accueil**.
 
