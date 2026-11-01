@@ -87,7 +87,7 @@ git push -u origin main
 Au premier `push`, GitHub demande de s'authentifier (fenêtre du navigateur ou *Personal Access Token*).
 Ensuite, après chaque livraison : `git add . && git commit -m "message" && git push`.
 
-## 4. Limites connues (à dire clairement)
+## 4. Limites connues
 - Les teintes de `config.REFERENCE_TABLE` sont des **valeurs de démonstration**, pas celles d'un fabricant.
 - Les seuils de qualité (netteté, éclairage) sont calibrés sur des images simulées : à recalibrer sur de vraies photos.
 - Les couleurs de la carte sont supposées parfaites ; une carte imprimée réelle doit être mesurée.
