@@ -82,5 +82,5 @@ au lieu d'être lue comme un résultat « normal ».
 - **« Pourquoi refuser plutôt que deviner ? »** En santé, un faux résultat est pire qu'une photo à refaire.
 - **« Est-ce validé médicalement ? »** Non : c'est une preuve de concept validée sur simulation et sur une vraie carte
   imprimée. La validation clinique est la Phase 4 de la feuille de route.
-- **« Où est l'IA ? »** Vision par ordinateur (trouver, redresser, corriger) + KNN pour classer les couleurs, avec un
-  indice de confiance. Le réseau de neurones (TFLite) vient en Phase 3, avec de vraies photos annotées ; le code actuel est prêt à recevoir ces échantillons (`add_sample`).
+- **« Où est l'IA ? »** Vision par ordinateur (trouver, redresser, corriger) + KNN pour classer les couleurs, avec un indice de confiance.
+- Le réseau de neurones (TFLite) vient en Phase 3, avec de vraies photos annotées ; le code actuel est prêt à recevoir ces échantillons (`add_sample`).
