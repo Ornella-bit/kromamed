@@ -27,10 +27,8 @@ Alternative : **New → Blueprint** utilise directement `render.yaml`.
 
 ## À savoir (important pour le jour J)
 
-- **Mise en veille** : le gratuit s'endort après 15 minutes sans visite ; le réveil prend de quelques secondes
-  à environ une minute. **Ouvrez l'adresse 5 minutes avant de présenter.**
-- **Puissance limitée** : l'offre gratuite est très petite (512 Mo, 0,1 CPU). L'analyse peut prendre quelques
-  secondes au lieu de 0,2 s. C'est normal ; ce n'est pas la performance finale du moteur.
+- **Mise en veille** : le gratuit s'endort après 15 minutes sans visite ; le réveil prend de quelques secondes à environ une minute. **Ouvrez l'adresse 5 minutes avant de présenter.**
+- **Puissance limitée** : l'offre gratuite est très petite (512 Mo, 0,1 CPU). L'analyse peut prendre quelques secondes au lieu de 0,2 s. C'est normal ; ce n'est pas la performance finale du moteur.
 - **Mises à jour** : chaque `git push` sur `main` redéploie automatiquement.
 - Si le déploiement échoue : ouvrez l'onglet **Logs** et copiez-moi la dernière erreur.
 

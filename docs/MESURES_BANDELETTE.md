@@ -6,7 +6,7 @@ pour que le moteur lise au bon endroit, il faut mettre les mesures de VOTRE band
 Posez une bandelette Multistix 10 SG à plat à côté d'une règle. Notez (en mm) :
 
 | # | Mesure | Valeur estimée actuelle | Votre mesure |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | Largeur de la bandelette | 5,5 | |
 | 2 | Longueur totale | 95 | |
 | 3 | Côté d'une plage colorée (carré) | 4,5 | |
@@ -20,7 +20,7 @@ Leucocytes, Nitrites, Urobilinogène, Protéines, pH, Sang, Densité, Cétones, 
 Ensuite : ouvrez `kromamed/config.py`, section « Bandelette Multistix 10 SG », et remplacez
 `STRIP_W_MM`, `STRIP_LEN_MM`, `PAD_SIZE_MM`, `PAD_PITCH_MM`, `FIRST_PAD_MM` par vos valeurs. Puis :
 
-```
+```bash
 python scripts/make_card.py     # nouvelle carte à imprimer
 pytest -q                       # doit afficher 38 passed
 ```
