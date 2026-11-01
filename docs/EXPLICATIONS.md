@@ -1,11 +1,13 @@
 # Comprendre le code, fichier par fichier
 
 ## L'idée en une phrase
+
 Une photo de bandelette change d'aspect selon la lumière. On pose donc la bandelette sur une **carte imprimée à papier
 blanc** : le papier blanc, visible dans la même photo, sert de référence pour corriger la lumière et sa teinte. On lit
 ensuite la couleur de chaque plage et on la compare à une table de référence.
 
 ## Le trajet d'une photo (`kromamed/pipeline.py`, fonction `analyze`)
+
 1. **Trouver la carte** : 4 repères noir et blanc (ArUco) aux coins.
 2. **Redresser** : on remet la carte « bien droite » même si la photo est de travers (homographie).
 3. **Corriger la lumière** : le papier doit être blanc partout ; s'il est plus sombre d'un côté, on rattrape
@@ -18,6 +20,7 @@ ensuite la couleur de chaque plage et on la compare à une table de référence.
    « indéterminé » si deux niveaux sont trop proches.
 
 ## Pourquoi le papier blanc et pas les couleurs imprimées ? (l'histoire à raconter)
+
 Une première version forçait les couleurs imprimées de la carte vers leurs valeurs « idéales ». Un test avec une **vraie
 carte imprimée** a montré que l'imprimante s'écarte beaucoup de l'idéal (un vert 4 fois plus sombre, des gris teintés) :
 l'étalonnage tombait à 0 % et déformait les couleurs. La référence est donc maintenant le **papier blanc** ; les carrés de
@@ -25,8 +28,9 @@ gris et de couleur servent seulement de contrôles. Autre conséquence : une car
 au lieu d'être lue comme un résultat « normal ».
 
 ## Les fichiers du moteur (`kromamed/`)
+
 | Fichier | Rôle | Quand le modifier |
-|---|---|---|
+| --- | --- | --- |
 | `config.py` | Tout ce qui se règle : taille de la carte, positions des plages, couleurs de référence, seuils | Changer de bandelette ou de carte |
 | `card.py` | Dessine la carte ; détecte les repères ; redresse la photo | Changer la disposition de la carte |
 | `illumination.py` | Estime la lumière (surface lisse) et la retire ; mesure l'écart à cette surface | Rarement |
@@ -39,6 +43,7 @@ au lieu d'être lue comme un résultat « normal ».
 | `drawing.py` | Petit outil de dessin compatible OpenCV 4 et 5 | Jamais |
 
 ## Le serveur (`api/`) et l'application (`web/`)
+
 - `api/main.py` : serveur FastAPI. Il reçoit la photo, appelle `analyze()` et renvoie le résultat en JSON avec des
   images annotées. Il ne contient **aucun calcul de vision** : tout reste dans `kromamed/`.
 - `api/report.py` (rapport PDF) et `api/exports.py` (export Excel) travaillent **en mémoire** : rien n'est conservé.
@@ -57,13 +62,14 @@ au lieu d'être lue comme un résultat « normal ».
 - `Dockerfile` + `render.yaml` : la « recette » pour mettre le site en ligne sur Render à chaque envoi sur GitHub.
 
 ## Trois notions à retenir
-- **RGB linéaire** : la lumière « vraie ». Les corrections se font dessus ; l'image d'un téléphone est
-  « gamma » et fausserait les calculs.
+
+- **RGB linéaire** : la lumière « vraie ». Les corrections se font dessus ; l'image d'un téléphone est « gamma » et fausserait les calculs.
 - **L\*a\*b\*** : un espace de couleurs où la distance mathématique ressemble à la différence perçue par l'œil.
   **ΔE** = cette distance. ΔE < 2 : presque indiscernable.
 - **KNN (plus proches voisins)** : on cherche, dans la table, la référence la plus proche de la couleur mesurée.
 
 ## Les scripts (`scripts/`) et les tests (`tests/`)
+
 - `run.py` : analyse une photo, écrit `out/resultat.json` + images (carte redressée, corrigée, résultat annoté).
 - `benchmark.py` : 100 photos simulées → taux de bonnes lectures + cas qui doivent être refusés.
 - `make_card.py` : fabrique la carte à imprimer (PDF A4, taille réelle). `make_demo.py` : photo de démonstration.
@@ -72,6 +78,7 @@ au lieu d'être lue comme un résultat « normal ».
   caché, d'une ombre forte, d'une carte sans bandelette, et le test sur une **vraie photo** de carte imprimée.
 
 ## Réponses aux questions probables
+
 - **« Pourquoi refuser plutôt que deviner ? »** En santé, un faux résultat est pire qu'une photo à refaire.
 - **« Est-ce validé médicalement ? »** Non : c'est une preuve de concept validée sur simulation et sur une vraie carte
   imprimée. La validation clinique est la Phase 4 de la feuille de route.
